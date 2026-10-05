@@ -53,12 +53,16 @@ export const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', '
 export const MONTHS_LONG = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 export const WEEKDAYS_LONG = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
-export const REMINDERS: Record<Reminder, { label: string; time: string; hour: number }> = {
-  morning: { label: 'Morning', time: '8:00 am', hour: 8 },
-  afternoon: { label: 'Afternoon', time: '3:00 pm', hour: 15 },
-  evening: { label: 'Evening', time: '7:00 pm', hour: 19 },
-};
-export const REMINDER_KEYS = Object.keys(REMINDERS) as Reminder[];
+/** Turns a reminder time like '19:30' into '7:30 pm'. */
+export function formatTime(t: Reminder): string {
+  const [h, m] = t.split(':').map(Number);
+  return `${h % 12 || 12}:${String(m).padStart(2, '0')} ${h < 12 ? 'am' : 'pm'}`;
+}
+
+export function parseTime(t: Reminder): { hour: number; minute: number } {
+  const [hour, minute] = t.split(':').map(Number);
+  return { hour, minute };
+}
 
 export const DONE_TITLES = ['Well done!', 'Nice work!', 'You did it!', 'Great job!'];
 
@@ -93,7 +97,7 @@ export const STRATEGY_LIBRARY: { name: string; desc: string }[] = [
   { name: 'Alarm + cue card', desc: 'A labelled phone alarm plus a card where the task happens.' },
 ];
 
-export const CONSENT_VERSION = '2026-10';
+export { POLICY_VERSION as CONSENT_VERSION } from './legal';
 
 /** Chooses an icon for a new task from words in its title, falling back to the area icon. */
 export function iconForTask(title: string, area: Area): string {

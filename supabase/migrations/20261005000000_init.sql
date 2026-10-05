@@ -107,7 +107,7 @@ create table public.strategies (
   timer_minutes int not null default 0 check (timer_minutes >= 0),
   freq_per_week int not null default 7 check (freq_per_week between 1 and 7),
   freq_days int[] not null default '{}',
-  reminder text check (reminder in ('morning', 'afternoon', 'evening')),
+  reminder text check (reminder ~ '^([01][0-9]|2[0-3]):[0-5][0-9]$'), -- local time 'HH:MM', null = none
   trial_length_days int not null default 14 check (trial_length_days > 0),
   started_on date not null default current_date,
   ended_on date,
@@ -561,7 +561,7 @@ begin
   end if;
 end $$;
 
--- Any team member: set the reminder time for a strategy.
+-- Any team member: set the reminder time ('HH:MM', or '' for none) for a strategy.
 create function public.set_reminder(p_strategy uuid, p_reminder text) returns void
 language plpgsql security definer set search_path = public as $$
 declare st public.strategies;
@@ -618,6 +618,25 @@ begin
   delete from public.people where id = p_person;
 end $$;
 
+-- Withdraw consent and delete your account (right to erasure).
+-- Deletes profiles you own (or that only you are on), leaves every other team, removes your
+-- name from notes you wrote on other people's profiles, then deletes the account itself.
+create function public.delete_my_account() returns void
+language plpgsql security definer set search_path = public as $$
+declare uid uuid := auth.uid(); m record;
+begin
+  if uid is null then raise exception 'Not signed in' using errcode = '28000'; end if;
+  delete from public.people p
+   where exists (select 1 from public.team_memberships x where x.person_id = p.id and x.user_id = uid and x.role = 'self')
+      or (exists (select 1 from public.team_memberships x where x.person_id = p.id and x.user_id = uid)
+          and not exists (select 1 from public.team_memberships x where x.person_id = p.id and x.user_id <> uid));
+  for m in select person_id from public.team_memberships where user_id = uid loop
+    perform public._system_note(m.person_id, 'Left the team (account deleted).');
+  end loop;
+  update public.notes set author_name = 'Former team member' where author_id = uid;
+  delete from auth.users where id = uid;
+end $$;
+
 -- Therapist opened a client's data: write to the audit log.
 create function public.record_view(p_person uuid) returns void
 language plpgsql security definer set search_path = public as $$
@@ -636,6 +655,6 @@ grant execute on function
   public.create_invite(uuid, text, text, text), public.redeem_invite(text),
   public.add_task(uuid, text, text, text, jsonb), public.archive_task(uuid), public.switch_strategy(uuid, jsonb),
   public.extend_trial(uuid), public.set_flag(uuid, boolean), public.set_reminder(uuid, text),
-  public.log_feeling(uuid, text, text), public.remove_member(uuid), public.delete_person(uuid),
+  public.log_feeling(uuid, text, text), public.remove_member(uuid), public.delete_person(uuid), public.delete_my_account(),
   public.record_view(uuid)
 to authenticated;

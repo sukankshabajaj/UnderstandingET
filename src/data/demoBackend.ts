@@ -5,8 +5,9 @@ import type { Backend, NewTaskInput, PersonSettingsPatch } from './backend';
 import { DEMO_USERS, demoId, seedDemo, type DemoDB } from './demoData';
 import type { Feel, Feeling, Helped, Member, NewPerson, Note, Reminder, Role, Snapshot } from '../types';
 import { todayISO } from '../logic/dates';
+import { POLICY_VERSION } from '../legal';
 
-const KEY = 'stepwise-demo-v1';
+const KEY = 'stepwise-demo-v2'; // v2: reminders are exact times
 
 export type DemoRole = keyof typeof DEMO_USERS;
 
@@ -123,6 +124,14 @@ export class DemoBackend implements Backend {
   async signIn() {}
   async resetPassword() {}
   async signOut() {
+    await this.reset();
+  }
+  // The demo has no real accounts, so it never asks for consent again.
+  async getConsentVersion() {
+    return POLICY_VERSION;
+  }
+  async acceptConsent() {}
+  async deleteAccount() {
     await this.reset();
   }
 

@@ -376,3 +376,51 @@ export function Sheet({ visible, onClose, children, reduceMotion, scroll }: { vi
     </View>
   );
 }
+
+// --- Time picker -------------------------------------------------------------------------
+
+function Stepper({ label, value, onMinus, onPlus }: { label: string; value: string; onMinus: () => void; onPlus: () => void }) {
+  return (
+    <Col gap={4} style={{ alignItems: 'center', flex: 1 }}>
+      <IconBtn icon="add" label={`Later ${label}`} onPress={onPlus} bg="#fff" style={{ borderWidth: 1, borderColor: colors.border }} />
+      <T bold size={30} style={{ fontVariant: ['tabular-nums'] }} >
+        {value}
+      </T>
+      <IconBtn icon="remove" label={`Earlier ${label}`} onPress={onMinus} bg="#fff" style={{ borderWidth: 1, borderColor: colors.border }} />
+    </Col>
+  );
+}
+
+/** Pick any time of day. Value is 24-hour 'HH:MM'; minutes move in 5-minute steps. */
+export function TimePicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [h, m] = value.split(':').map(Number);
+  const set = (hour: number, minute: number) => onChange(`${String((hour + 24) % 24).padStart(2, '0')}:${String(minute).padStart(2, '0')}`);
+  const pm = h >= 12;
+  return (
+    <View accessibilityLabel="Reminder time" style={{ backgroundColor: '#fff', borderWidth: 1, borderColor: colors.border, borderRadius: 18, padding: 12, gap: 10 }}>
+      <Row gap={8} justify="center">
+        <Stepper label="hour" value={String(h % 12 || 12)} onPlus={() => set(h + 1, m)} onMinus={() => set(h - 1, m)} />
+        <T bold size={30}>
+          :
+        </T>
+        <Stepper
+          label="minutes"
+          value={String(m).padStart(2, '0')}
+          onPlus={() => (m >= 55 ? set(h + 1, 0) : set(h, m + 5))}
+          onMinus={() => (m <= 0 ? set(h - 1, 55) : set(h, m - 5))}
+        />
+      </Row>
+      <Segmented<'am' | 'pm'>
+        options={[
+          ['am', 'am'],
+          ['pm', 'pm'],
+        ]}
+        value={pm ? 'pm' : 'am'}
+        onChange={(k) => {
+          if (k === 'pm' && !pm) set(h + 12, m);
+          if (k === 'am' && pm) set(h - 12, m);
+        }}
+      />
+    </View>
+  );
+}

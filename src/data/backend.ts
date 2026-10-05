@@ -35,6 +35,11 @@ export interface Backend {
   signIn(email: string, password: string): Promise<void>;
   resetPassword(email: string): Promise<void>;
   signOut(): Promise<void>;
+  /** The Privacy Policy / Terms version this user last agreed to (null if none). */
+  getConsentVersion(): Promise<string | null>;
+  acceptConsent(version: string): Promise<void>;
+  /** Withdraws consent and permanently deletes the signed-in account and the profiles it owns. */
+  deleteAccount(): Promise<void>;
 
   /** True if this user's email is on the clinic's list of clinicians (can create client profiles). */
   isClinician(): Promise<boolean>;

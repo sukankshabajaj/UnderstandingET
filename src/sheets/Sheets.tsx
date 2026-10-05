@@ -2,9 +2,9 @@
 import React, { useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { useSnap } from '../state/app';
-import { AREAS, AREA_KEYS, DAY_LETTER, DONE_TITLES, FEELING, FEELINGS, FREQS, REMINDERS, REMINDER_KEYS, STRATEGY_LIBRARY, iconForTask } from '../constants';
+import { AREAS, AREA_KEYS, DAY_LETTER, DONE_TITLES, FEELING, FEELINGS, FREQS, STRATEGY_LIBRARY, formatTime, iconForTask } from '../constants';
 import { colors, deep, mid, tint } from '../theme';
-import { Btn, Choice, Col, Field, Grid, Icon, Input, Row, Sheet, T } from '../ui/kit';
+import { Btn, Choice, Col, Field, Grid, Icon, Input, Row, Sheet, T, TimePicker } from '../ui/kit';
 import { freqText, todayPlan } from '../logic/stats';
 import type { Area, Feeling, Reminder } from '../types';
 
@@ -54,7 +54,6 @@ function AddTask() {
     setBusy(false);
     if (done) app.closeSheet();
   };
-  const pick = (on: boolean) => (on ? { borderColor: colors.pickBorder, backgroundColor: colors.pickBg } : {});
   return (
     <Col gap={16}>
       <Col gap={4}>
@@ -130,17 +129,24 @@ function AddTask() {
           {days.length ? `${freqText({ freq_per_week: days.length, freq_days: days })}. Tap a day again to remove it.` : `No set days. Any day counts toward ${freqText({ freq_per_week: freq, freq_days: [] }).toLowerCase()}.`}
         </T>
       </Field>
-      <Field label="Reminder">
-        <Grid cols={2}>
-          {[null, ...REMINDER_KEYS].map((k) => (
-            <Choice key={k ?? 'off'} selected={rem === k} onPress={() => setRem(k)} style={pick(rem === k)}>
+      {app.reminders.shown ? (
+        <Field label="Reminder" optional>
+          <Grid cols={2}>
+            <Choice selected={rem === null} onPress={() => setRem(null)}>
               <T bold size={14}>
-                {k ? `${REMINDERS[k].label} · ${REMINDERS[k].time.replace(':00', '')}` : 'No reminder'}
+                No reminder
               </T>
             </Choice>
-          ))}
-        </Grid>
-      </Field>
+            <Choice selected={rem !== null} onPress={() => setRem(rem ?? '19:00')}>
+              <T bold size={14}>
+                Remind me
+              </T>
+            </Choice>
+          </Grid>
+          {rem !== null ? <TimePicker value={rem} onChange={setRem} /> : null}
+          {app.reminders.webNote ? <ReminderWebNote /> : null}
+        </Field>
+      ) : null}
       <Btn label={busy ? 'Adding…' : 'Add task'} size="md" disabled={!ok || busy} onPress={save} />
     </Col>
   );
@@ -219,6 +225,8 @@ function WellDone({ taskId }: { taskId: string }) {
   const { snap, idx, today } = app;
   const task = snap.tasks.find((t) => t.id === taskId);
   const strategy = snap.strategies.find((s) => s.task_id === taskId && !s.ended_on);
+  const [picking, setPicking] = useState(false);
+  const [time, setTime] = useState('19:00');
   if (!task || !strategy) return null;
   const a = AREAS[task.area];
   const left = todayPlan(snap, idx, today).filter((p) => !p.log).length;
@@ -238,38 +246,34 @@ function WellDone({ taskId }: { taskId: string }) {
           {left ? `Keep going! ${left} ${left === 1 ? 'task' : 'tasks'} left today.` : 'Everything is done for today.'}
         </T>
       </Col>
-      {!rem ? (
+      {!app.reminders.shown ? null : !rem ? (
         <View style={{ alignSelf: 'stretch', backgroundColor: '#fff', borderWidth: 1, borderColor: colors.border, borderRadius: 18, padding: 16, gap: 10 }}>
           <T bold size={16}>
             Want a reminder for {task.title.toLowerCase()} next time?
           </T>
-          <Grid cols={3}>
-            {REMINDER_KEYS.map((k) => (
-              <Pressable
-                key={k}
-                accessibilityRole="button"
+          {picking ? (
+            <>
+              <TimePicker value={time} onChange={setTime} />
+              <Btn
+                label={`Remind me at ${formatTime(time)}`}
+                size="md"
                 onPress={async () => {
                   app.closeSheet();
-                  await app.actions.setReminder(strategy.id, k, `${REMINDERS[k].label} reminder set for ${REMINDERS[k].time}`);
+                  await app.actions.setReminder(strategy.id, time, `Reminder set for ${formatTime(time)}`);
                 }}
-                style={{ alignItems: 'center', gap: 2, borderWidth: 1.5, borderColor: colors.inputBorder, backgroundColor: '#fff', borderRadius: 12, paddingVertical: 10, paddingHorizontal: 4, minHeight: 56, justifyContent: 'center' }}
-              >
-                <T bold size={14}>
-                  {REMINDERS[k].label}
-                </T>
-                <T size={12} color={colors.muted}>
-                  {REMINDERS[k].time}
-                </T>
-              </Pressable>
-            ))}
-          </Grid>
+              />
+              {app.reminders.webNote ? <ReminderWebNote /> : null}
+            </>
+          ) : (
+            <Btn label="Choose a time" icon="schedule" variant="secondary" size="md" onPress={() => setPicking(true)} />
+          )}
         </View>
       ) : (
         <T size={14} color={colors.muted}>
-          Reminder set for {REMINDERS[rem].time}.
+          Reminder set for {formatTime(rem)}.
         </T>
       )}
-      <Btn label={rem ? 'Done' : 'No thanks'} size="md" style={{ alignSelf: 'stretch' }} onPress={app.closeSheet} />
+      <Btn label={rem || !app.reminders.shown ? 'Done' : 'No thanks'} size="md" style={{ alignSelf: 'stretch' }} onPress={app.closeSheet} />
     </Col>
   );
 }
@@ -333,5 +337,14 @@ function SwitchSheet({ strategyId }: { strategyId: string }) {
         }}
       />
     </Col>
+  );
+}
+
+/** Shown with reminder settings in the web version (the demo), where phone reminders can't be delivered. */
+function ReminderWebNote() {
+  return (
+    <T size={13} color={colors.muted} lh={1.4}>
+      Reminders are sent by the Stepwise phone app. In this web version they are saved but not sent.
+    </T>
   );
 }

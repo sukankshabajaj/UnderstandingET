@@ -17,9 +17,11 @@ Understanding ET therapist see whether it's working and when it's time to switch
 | **Support person** | Overview (today + every strategy's status), strategy evidence, flag for therapist review, Tracker, Notes |
 | **Therapist** | Everything support can do, plus extend a trial, switch strategy, create client profiles, invite people, a client list |
 
-Also: opening screens and sign-up with an 18+ check and consent, 6-digit invite codes, picture mode,
-read-aloud, reduce-motion, phone reminders (morning / afternoon / evening, private by default),
-an audit trail of every change in Notes, data download, and full profile deletion.
+Also: opening screens and sign-up with an 18+ check, a Privacy Policy and Terms of Use (draft, see
+[docs/legal](docs/legal/README.md)) with recorded consent that is asked for again when they change,
+6-digit invite codes, picture mode, read-aloud, reduce-motion, phone reminders at any chosen time
+(private by default; hidden in the live web version, which can't send them), an audit trail of every
+change in Notes, data download, profile deletion, and account deletion (withdraws consent).
 
 **Switch rule** (from the design handoff): helped rate = sum of ratings ÷ (2 × rated check-ins).
 Fewer than 5 ratings = *Too early*; ≥ 65% *Working*; 45–64% *Mixed*; < 45% *Not working*.
@@ -50,3 +52,5 @@ design/                  the original Claude Design prototype and handoff notes
 - A screen for the client to see the therapist view log (the data is already recorded).
 - Editing an existing task or strategy (for now, remove and re-add, or switch strategy).
 - Clinic-wide admin screen (the switch-rule settings and clinician list are edited in Supabase).
+- Automatic deletion of inactive profiles after 12 months (the Privacy Policy promises this; for now it's done by hand).
+- Reminders in the web version (they need the App Store / Google Play app).

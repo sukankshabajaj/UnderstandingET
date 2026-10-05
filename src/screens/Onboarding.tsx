@@ -7,6 +7,7 @@ import { colors, deep, tint } from '../theme';
 import { BackLink, Btn, Card, Checkbox, Choice, Col, Field, Grid, Heading, Icon, InfoBox, Input, Row, StepHeader, T, Toggle } from '../ui/kit';
 import { DemoBackend } from '../data/demoBackend';
 import { friendlyError } from '../data/backend';
+import { ConsentChecks, LegalLinks } from './Legal';
 import type { Area } from '../types';
 
 const Spacer = () => <View style={{ flex: 1, minHeight: 12 }} />;
@@ -74,6 +75,9 @@ export function Welcome() {
         ) : (
           <Btn label="I already have an account" variant="ghost" onPress={() => { app.setIntent(null); app.go('auth', { authMode: 'signin' }); }} />
         )}
+        <View style={{ alignItems: 'center' }}>
+          <LegalLinks />
+        </View>
       </Col>
     </View>
   );
@@ -86,13 +90,13 @@ export function Auth() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [adult, setAdult] = useState(false);
-  const [consent, setConsent] = useState(false);
-  const [showPrivacy, setShowPrivacy] = useState(false);
+  const [terms, setTerms] = useState(false);
+  const [health, setHealth] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
   const emailOk = /\S+@\S+\.\S+/.test(email.trim());
-  const canSubmit = mode === 'signin' ? emailOk && password.length > 0 : !!name.trim() && emailOk && password.length >= 8 && adult && consent;
+  const canSubmit = mode === 'signin' ? emailOk && password.length > 0 : !!name.trim() && emailOk && password.length >= 8 && adult && terms && health;
 
   const submit = async () => {
     if (!canSubmit || busy) return;
@@ -157,13 +161,7 @@ export function Auth() {
       {mode === 'signup' ? (
         <Col gap={4}>
           <Checkbox on={adult} onPress={() => setAdult(!adult)} label="I confirm I am 18 or older" />
-          <Checkbox on={consent} onPress={() => setConsent(!consent)} label="I agree that Stepwise can store my information and share it with the team I choose" />
-          <Pressable onPress={() => setShowPrivacy(!showPrivacy)} accessibilityRole="button" style={{ minHeight: 44, justifyContent: 'center' }}>
-            <T bold size={14} color={colors.primary}>
-              {showPrivacy ? 'Hide' : 'What is stored and who sees it?'}
-            </T>
-          </Pressable>
-          {showPrivacy ? <PrivacySummary /> : null}
+          <ConsentChecks terms={terms} health={health} setTerms={setTerms} setHealth={setHealth} />
         </Col>
       ) : null}
       {message ? <InfoBox icon="info">{message}</InfoBox> : null}
@@ -181,25 +179,6 @@ export function Auth() {
         {mode === 'signin' ? <Btn variant="ghost" size="md" label="Forgot password?" onPress={forgot} /> : null}
       </Col>
     </View>
-  );
-}
-
-export function PrivacySummary() {
-  return (
-    <Card gap={8} style={{ backgroundColor: colors.infoBox, borderWidth: 0 }}>
-      <T size={14} lh={1.5} color={colors.body}>
-        • What we store: your name and email, the profile details you enter (first name, age band, optional diagnosis or support needs), tasks, strategies, check-ins, feelings and notes.
-      </T>
-      <T size={14} lh={1.5} color={colors.body}>
-        • Why: so you and your team can see which strategies help.
-      </T>
-      <T size={14} lh={1.5} color={colors.body}>
-        • Who sees it: only the people on your team: you, the support people you invite, and your Understanding ET therapist. You can remove a support person at any time.
-      </T>
-      <T size={14} lh={1.5} color={colors.body}>
-        • Your choices: you can download your data or delete your profile from Settings. Deleting removes everything.
-      </T>
-    </Card>
   );
 }
 

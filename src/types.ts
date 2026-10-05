@@ -2,7 +2,8 @@
 
 export type Role = 'self' | 'support' | 'therapist';
 export type Area = 'daily' | 'school' | 'work' | 'chores';
-export type Reminder = 'morning' | 'afternoon' | 'evening';
+/** A reminder time in 24-hour 'HH:MM' local time, e.g. '19:30'. */
+export type Reminder = string;
 export type Feel = 'Easy' | 'Okay' | 'Hard';
 export type Helped = 0 | 1 | 2; // 2 = yes, 1 = a little, 0 = no
 export type Feeling = 'Calm' | 'Happy' | 'Tired' | 'Worried' | 'Frustrated' | 'Overwhelmed';

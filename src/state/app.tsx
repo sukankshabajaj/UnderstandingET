@@ -2,13 +2,14 @@
 // bottom sheets and toasts. Screens read from useApp() and call its actions.
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { AppState, BackHandler } from 'react-native';
+import { AppState, BackHandler, Platform } from 'react-native';
 import type { AuthUser, Backend, NewTaskInput, PersonSettingsPatch } from '../data/backend';
 import { friendlyError } from '../data/backend';
 import { DemoBackend } from '../data/demoBackend';
 import { indexLogs, type LogIndex } from '../logic/stats';
 import { todayISO } from '../logic/dates';
 import { syncReminders } from '../notifications';
+import { POLICY_VERSION } from '../legal';
 import type { Area, Feel, Feeling, Helped, InviteResult, NewPerson, PersonSummary, Reminder, Role, Snapshot } from '../types';
 
 export type RouteName =
@@ -31,11 +32,13 @@ export type RouteName =
   | 'notes'
   | 'overview'
   | 'strategy'
-  | 'settings';
+  | 'settings'
+  | 'legal'
+  | 'consent';
 
 export interface Route {
   name: RouteName;
-  params?: { taskId?: string; strategyId?: string; authMode?: 'signin' | 'signup' };
+  params?: { taskId?: string; strategyId?: string; authMode?: 'signin' | 'signup'; doc?: 'privacy' | 'terms'; intent?: 'start' | 'join' | null };
 }
 
 export type SheetState =
@@ -141,6 +144,8 @@ function useAppValue(backend: Backend) {
           reset('welcome');
           return;
         }
+        // Everyone must have agreed to the current Privacy Policy and Terms before using the app.
+        if ((await backend.getConsentVersion()) !== POLICY_VERSION) return reset('consent', { intent: nextIntent });
         const list = await backend.listPeople();
         setPeople(list);
         if (nextIntent === 'start') return reset('ob-who');
@@ -293,8 +298,16 @@ function useAppValue(backend: Backend) {
 
   const idx: LogIndex = useMemo(() => indexLogs(snap?.logs ?? []), [snap]);
 
+  // Reminders are phone notifications. The live web link can't deliver them, so it hides them;
+  // the demo still shows them on the web (with a note) so the design can be reviewed.
+  const reminders = {
+    shown: Platform.OS !== 'web' || backend.mode === 'demo',
+    webNote: Platform.OS === 'web',
+  };
+
   return {
     backend,
+    reminders,
     user,
     people,
     snap,

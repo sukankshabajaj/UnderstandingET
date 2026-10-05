@@ -16,6 +16,7 @@ import { CheckIn, MyWeek, TaskScreen, Today } from './src/screens/Person';
 import { Tracker } from './src/screens/Tracker';
 import { Clients, Notes, Overview, StrategyDetail } from './src/screens/Team';
 import { Settings } from './src/screens/Settings';
+import { ConsentScreen, LegalScreen } from './src/screens/Legal';
 import { Sheets } from './src/sheets/Sheets';
 
 const SCREENS: Partial<Record<RouteName, React.ComponentType>> = {
@@ -38,6 +39,8 @@ const SCREENS: Partial<Record<RouteName, React.ComponentType>> = {
   overview: Overview,
   strategy: StrategyDetail,
   settings: Settings,
+  legal: LegalScreen,
+  consent: ConsentScreen,
 };
 
 /** Screens that need a loaded person and show the bottom navigation. */

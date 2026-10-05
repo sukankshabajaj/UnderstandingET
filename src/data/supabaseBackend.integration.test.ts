@@ -38,6 +38,12 @@ run('SupabaseBackend (live)', () => {
     await expect(young.signUp({ email: `young${stamp}@example.com`, password: pw, displayName: 'Y', ageConfirmed: false, consentVersion: '2026-10' })).rejects.toThrow(/18/);
   });
 
+  it('records the policy version agreed to at sign-up, and a new agreement', async () => {
+    expect(await sam.getConsentVersion()).toBe('2026-10');
+    await sam.acceptConsent('2099-01-01');
+    expect(await sam.getConsentVersion()).toBe('2099-01-01');
+  });
+
   it('lets an adult create their own profile and invite their team', async () => {
     expect(await sam.isClinician()).toBe(false);
     await expect(sam.createPerson({ first_name: 'Jo', age_band: '25-34', age_confirmed: true, dx_tags: [], needs: [], tracked_areas: [], picture_mode: false, read_aloud: false, reduce_motion: false, my_role: 'therapist', invites: [] })).rejects.toThrow(/clinicians/);
@@ -71,8 +77,8 @@ run('SupabaseBackend (live)', () => {
     expect(snap.logs[0].helped).toBe(2);
     await sam.deleteLog(s.id, date);
     expect((await sam.load(personId)).logs).toHaveLength(0);
-    await sam.setReminder(s.id, 'morning');
-    expect((await sam.load(personId)).strategies[0].reminder).toBe('morning');
+    await sam.setReminder(s.id, '07:45');
+    expect((await sam.load(personId)).strategies[0].reminder).toBe('07:45');
     expect(snap.notes.some((n) => n.kind === 'system' && /Added "Took medicine"/.test(n.text))).toBe(true);
   });
 
@@ -136,6 +142,12 @@ run('SupabaseBackend (live)', () => {
     await sam.deletePerson(personId);
     expect(await sam.listPeople()).toHaveLength(0);
     expect(await okafor.listPeople().then((l) => l.some((p) => p.person.id === personId))).toBe(false);
+  });
+
+  it('deletes an account completely (withdrawing consent)', async () => {
+    await alex.deleteAccount();
+    expect(await alex.getUser()).toBeNull();
+    await expect(alex.signIn(`alex${stamp}@example.com`, pw)).rejects.toThrow();
   });
 
   it('signs out', async () => {

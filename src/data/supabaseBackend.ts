@@ -71,6 +71,25 @@ export class SupabaseBackend implements Backend {
     await this.sb.auth.signOut();
   }
 
+  async getConsentVersion() {
+    const uid = await this.uid();
+    const rows = ok(
+      await this.sb.from('consents').select('version').eq('user_id', uid).is('withdrawn_at', null).order('accepted_at', { ascending: false }).limit(1),
+    ) as { version: string }[];
+    return rows[0]?.version ?? null;
+  }
+
+  async acceptConsent(version: string) {
+    const uid = await this.uid();
+    ok(await this.sb.from('consents').insert({ user_id: uid, version }));
+  }
+
+  async deleteAccount() {
+    ok(await this.sb.rpc('delete_my_account'));
+    // The account no longer exists, so just clear the session on this device.
+    await this.sb.auth.signOut({ scope: 'local' });
+  }
+
   private async uid() {
     const u = await this.getUser();
     if (!u) throw new Error('Please sign in again.');

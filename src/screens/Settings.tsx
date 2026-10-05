@@ -4,10 +4,12 @@ import { Platform, Share, View } from 'react-native';
 import { useSnap } from '../state/app';
 import { colors } from '../theme';
 import { BackLink, Btn, Card, Col, Row, Segmented, T } from '../ui/kit';
-import { AccessRow, ACCESS_OPTS, PrivacySummary } from './Onboarding';
+import { AccessRow, ACCESS_OPTS } from './Onboarding';
+import { PrivacyCard } from './Legal';
 import { roleLabel } from './Team';
 import { DemoBackend, type DemoRole } from '../data/demoBackend';
 import { confirm } from '../confirm';
+import { friendlyError } from '../data/backend';
 import type { Member, Role } from '../types';
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -83,6 +85,7 @@ export function Settings() {
         {ACCESS_OPTS.map((o) => (
           <AccessRow key={o.k} icon={o.icon} label={o.label} sub={o.sub} on={snap.person[o.field]} onPress={() => (canEdit ? app.actions.updatePerson({ [o.field]: !snap.person[o.field] }) : app.toast(`Only ${snap.person.first_name} or their therapist can change this`))} />
         ))}
+        {app.reminders.shown ? (
         <AccessRow
           icon="lock"
           label="Private reminders"
@@ -90,6 +93,7 @@ export function Settings() {
           on={snap.person.private_notifications}
           onPress={() => (canEdit ? app.actions.updatePerson({ private_notifications: !snap.person.private_notifications }) : app.toast('Only the person or their therapist can change this'))}
         />
+        ) : null}
       </Section>
 
       <Section title="Team">
@@ -148,8 +152,8 @@ export function Settings() {
         ) : null}
       </Section>
 
-      <Section title="Your data">
-        <PrivacySummary />
+      <Section title="Privacy and your data">
+        <PrivacyCard />
         <Btn label="Download data" icon="download" variant="secondary" size="md" onPress={exportData} />
         {canDelete ? (
           <Btn
@@ -174,6 +178,27 @@ export function Settings() {
           </T>
           {app.people.length > 1 ? <Btn label="Switch profile" variant="secondary" size="md" onPress={() => app.reset('clients')} /> : null}
           <Btn label="Sign out" icon="logout" variant="ghost" size="md" onPress={() => app.backend.signOut()} />
+          <Btn
+            label="Delete my account"
+            icon="delete"
+            variant="ghost"
+            size="md"
+            color={colors.alertFg}
+            onPress={async () => {
+              const ok = await confirm(
+                'Delete your account?',
+                'This withdraws your consent and permanently deletes your account. Profiles you own are deleted with everything on them, and you leave every other team. This cannot be undone.',
+                'Delete',
+              );
+              if (!ok) return;
+              try {
+                await app.backend.deleteAccount();
+                app.toast('Your account has been deleted');
+              } catch (e) {
+                app.toast(friendlyError(e));
+              }
+            }}
+          />
         </Section>
       ) : null}
       <View style={{ height: 8 }} />

@@ -57,7 +57,7 @@ select test.fails($$select public.create_person('Sam', '25-34', false, '{}', '{}
 select test.fails($$select public.create_person('Kai', '25-34', true, '{}', '{}', '{}', false, false, false, 'therapist')$$, 'clinician');
 
 select public.add_task(:'pid', 'Took medicine', 'daily', 'medication',
-  '{"name":"Alarm + pill organizer","description":"Organizer by the kettle","steps":["Alarm goes off","Take meds"],"freq_per_week":7,"freq_days":[0,1,2,3,4],"reminder":"morning"}') as tid \gset
+  '{"name":"Alarm + pill organizer","description":"Organizer by the kettle","steps":["Alarm goes off","Take meds"],"freq_per_week":7,"freq_days":[0,1,2,3,4],"reminder":"08:00"}') as tid \gset
 select id as sid from public.strategies where task_id = :'tid' \gset
 select test.eq((select freq_days from public.strategies where id = :'sid'), '{0,1,2,3,4}'::int[], 'add_task stores chosen days');
 select test.eq((select trial_length_days from public.strategies where id = :'sid'), 14, 'trial length comes from settings');
@@ -122,8 +122,9 @@ select test.fails(format($$select public.extend_trial(%L)$$, :'sid'), 'Only the 
 select public.set_flag(:'sid', true);
 select public.set_flag(:'sid', true);
 select test.eq((select count(*) from public.flags where resolved_at is null), 1::bigint, 'support can flag (once)');
-select public.set_reminder(:'sid', 'evening');
-select test.eq((select reminder from public.strategies where id = :'sid'), 'evening', 'any member can set a reminder');
+select public.set_reminder(:'sid', '19:30');
+select test.eq((select reminder from public.strategies where id = :'sid'), '19:30', 'any member can set a reminder');
+select test.fails(format($$select public.set_reminder(%L, 'evening')$$, :'sid'), 'check constraint');
 
 -- ---------------------------------------------------------------- Dr. Okafor (therapist)
 reset role;
@@ -139,7 +140,7 @@ select public.switch_strategy(:'sid', '{"name":"Token board","description":"Earn
 select test.eq((select end_reason from public.strategies where id = :'sid'), 'switched', 'old strategy ends as switched');
 select test.eq((select replaced_strategy_id from public.strategies where id = :'nsid'), :'sid'::uuid, 'new strategy links the old one');
 select test.eq((select steps from public.strategies where id = :'nsid'), '{"Alarm goes off","Take meds"}'::text[], 'steps carry over when not given');
-select test.eq((select reminder from public.strategies where id = :'nsid'), 'evening', 'reminder carries over');
+select test.eq((select reminder from public.strategies where id = :'nsid'), '19:30', 'reminder carries over');
 select test.fails(format($$select public.switch_strategy(%L, '{"name":"Again"}')$$, :'sid'), 'already ended');
 select test.eq((select count(*) from public.notes where kind = 'system' and text like 'Switched%'), 1::bigint, 'switch is written to the notes audit trail');
 
@@ -213,6 +214,24 @@ reset role;
 select test.eq((select count(*) from public.tasks where person_id = :'pid'), 0::bigint, 'delete removes tasks');
 select test.eq((select count(*) from public.notes where person_id = :'pid'), 0::bigint, 'delete removes notes');
 select test.eq((select count(*) from public.logs where person_id = :'pid'), 0::bigint, 'delete removes logs');
+
+-- Deleting your account withdraws consent and erases you
+reset role;
+select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-000000000004', false);
+set role authenticated;
+insert into public.notes (person_id, author_id, text) values (:'pid2', auth.uid(), 'Eve was here');
+select public.delete_my_account();
+reset role;
+select test.eq((select count(*) from auth.users where email = 'eve@example.com'), 0::bigint, 'delete_my_account removes the sign-in');
+select test.eq((select count(*) from public.consents c join public.profiles p on p.id = c.user_id where p.email = 'eve@example.com'), 0::bigint, 'and the consent record');
+select test.eq((select count(*) from public.people where id = :'pid2'), 0::bigint, 'and the profile they own (with its notes)');
+select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-000000000003', false);
+set role authenticated;
+select (public.create_person('Kim', '25-34', true, '{}', '{}', '{}', false, false, false, 'therapist', '[]')) ->> 'person_id' as pid3 \gset
+insert into public.notes (person_id, author_id, text) values (:'pid3', auth.uid(), 'Session plan');
+select public.delete_my_account();
+reset role;
+select test.eq((select count(*) from public.people where id = :'pid3'), 0::bigint, 'a profile only they were on is deleted too');
 
 -- Signed-out (anon) can do nothing
 select set_config('request.jwt.claim.sub', '', false);

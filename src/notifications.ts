@@ -1,8 +1,8 @@
 // Task reminders, scheduled on the person's own phone (not on the web).
-// Morning 8:00, afternoon 3:00, evening 7:00, only on the strategy's chosen days.
+// At the time chosen for each strategy, only on the strategy's chosen days.
 import { Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';
-import { REMINDERS } from './constants';
+import { parseTime } from './constants';
 import { activeTasks } from './logic/stats';
 import type { Snapshot } from './types';
 
@@ -32,7 +32,7 @@ export async function syncReminders(snap: Snapshot): Promise<void> {
     await Notifications.setNotificationChannelAsync('reminders', { name: 'Task reminders', importance: Notifications.AndroidImportance.DEFAULT });
   }
   for (const { task, strategy } of wanted) {
-    const hour = REMINDERS[strategy.reminder!].hour;
+    const { hour, minute } = parseTime(strategy.reminder!);
     // Private by default: never show the task on the lock screen unless the person chose to.
     const content = {
       title: 'Stepwise',
@@ -43,13 +43,13 @@ export async function syncReminders(snap: Snapshot): Promise<void> {
         await Notifications.scheduleNotificationAsync({
           content,
           // Expo weekdays run 1 = Sunday … 7 = Saturday; ours run 0 = Monday … 6 = Sunday.
-          trigger: { type: Notifications.SchedulableTriggerInputTypes.WEEKLY, weekday: ((d + 1) % 7) + 1, hour, minute: 0, channelId: 'reminders' },
+          trigger: { type: Notifications.SchedulableTriggerInputTypes.WEEKLY, weekday: ((d + 1) % 7) + 1, hour, minute, channelId: 'reminders' },
         });
       }
     } else {
       await Notifications.scheduleNotificationAsync({
         content,
-        trigger: { type: Notifications.SchedulableTriggerInputTypes.DAILY, hour, minute: 0, channelId: 'reminders' },
+        trigger: { type: Notifications.SchedulableTriggerInputTypes.DAILY, hour, minute, channelId: 'reminders' },
       });
     }
   }

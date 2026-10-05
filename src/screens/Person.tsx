@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { useSnap } from '../state/app';
-import { AREAS, AREA_KEYS, FEELINGS, FEEL_OPTS, HELP_OPTS, REMINDERS, DAY_LETTER } from '../constants';
+import { AREAS, AREA_KEYS, FEELINGS, FEEL_OPTS, HELP_OPTS, DAY_LETTER, formatTime } from '../constants';
 import { colors, deep, mid, tint, HELP_HUE } from '../theme';
 import { BackLink, Btn, Card, Col, Grid, Icon, IconBtn, Row, T } from '../ui/kit';
 import { longDate, weekdayMon0 } from '../logic/dates';
@@ -199,7 +199,8 @@ export function TaskScreen() {
           </T>
         ) : null}
         <T size={13} color={colors.muted} style={{ paddingTop: 4 }}>
-          {freqText(strategy)} · {strategy.reminder ? `Reminder ${REMINDERS[strategy.reminder].time}` : 'No reminder'}
+          {freqText(strategy)}
+          {app.reminders.shown ? ` · ${strategy.reminder ? `Reminder ${formatTime(strategy.reminder)}` : 'No reminder'}` : ''}
         </T>
       </Card>
       {strategy.timer_minutes > 0 ? (

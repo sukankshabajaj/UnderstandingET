@@ -47,7 +47,7 @@ interface SeedTask {
 const SEED: SeedTask[] = [
   {
     title: 'Took medicine', area: 'daily', icon: 'medication', today: { feel: 'Easy', helped: 2 },
-    strat: { name: 'Alarm + pill organizer', desc: 'Phone alarm labelled "meds", organizer next to the kettle.', steps: ['Alarm goes off', 'Take meds from the organizer', 'Dismiss the alarm'], timer: 0, hist: [2, 2, 2, 1, 2, 2, null, 2, 2, 2, 2, 2, 2, 2, 1, 2], len: 21, prev: 'Remembering on my own', reminder: 'morning' },
+    strat: { name: 'Alarm + pill organizer', desc: 'Phone alarm labelled "meds", organizer next to the kettle.', steps: ['Alarm goes off', 'Take meds from the organizer', 'Dismiss the alarm'], timer: 0, hist: [2, 2, 2, 1, 2, 2, null, 2, 2, 2, 2, 2, 2, 2, 1, 2], len: 21, prev: 'Remembering on my own', reminder: '08:00' },
   },
   {
     title: 'Posted online', area: 'work', icon: 'campaign',
@@ -59,7 +59,7 @@ const SEED: SeedTask[] = [
   },
   {
     title: 'Clothes ready before sleep', area: 'daily', icon: 'checkroom',
-    strat: { name: 'Chair by the bed', desc: "Tomorrow's outfit goes on the chair before brushing teeth.", steps: ["Check tomorrow's weather", 'Pick the outfit', 'Put it on the chair'], timer: 0, hist: [2, null, 2, 2, 1, 2, null, 2, 2, 2], len: 14, prev: 'Choosing in the morning', reminder: 'evening' },
+    strat: { name: 'Chair by the bed', desc: "Tomorrow's outfit goes on the chair before brushing teeth.", steps: ["Check tomorrow's weather", 'Pick the outfit', 'Put it on the chair'], timer: 0, hist: [2, null, 2, 2, 1, 2, null, 2, 2, 2], len: 14, prev: 'Choosing in the morning', reminder: '19:00' },
   },
   {
     title: 'Course reading', area: 'school', icon: 'menu_book',

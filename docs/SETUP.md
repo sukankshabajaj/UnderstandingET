@@ -62,8 +62,8 @@ We use **Supabase** for this. It provides the database, logins and privacy rules
 2. Click **New project**.
    - **Name**: `stepwise`
    - **Database password**: generate a strong one and save it in your password manager.
-   - **Region**: pick the one closest to your clients (e.g. *Mumbai* for India, *London* for the UK).
-     Where data is stored matters for privacy law (see Part 5).
+   - **Region**: choose **South Asia (Mumbai)**. The Privacy Policy tells clients their data is stored in Mumbai, India.
+     If you pick a different region, change `DATA_LOCATION` in `src/legal.ts` to match (see Part 5).
 3. Wait about 2 minutes while it is created.
 
 ### 2. Create the tables and privacy rules
@@ -164,13 +164,13 @@ real clients use it:
 - [ ] **Data location**: the Supabase region you chose.
 - [ ] **Paid plan with backups**: free Supabase projects **pause after a week of no use** and have no point-in-time backups.
       Use the Pro plan for real clients.
-- [ ] **Privacy notice**: the in-app summary (shown at sign-up and in Settings) is a starting point, not a full privacy policy.
-      Publish a full one and link it.
+- [ ] **Privacy Policy and Terms of Use**: the app includes full drafts (Settings → Privacy and your data). Have them reviewed:
+      see [docs/legal/README.md](legal/README.md) for the exported text and a checklist for the reviewer.
 - [ ] **Data breach plan**: who does what, and reporting within 72 hours.
 - [ ] **Retention**: decide how long to keep data after a client finishes, and delete profiles you no longer need.
 - [ ] **Turn on multi-factor login** for your Supabase dashboard account.
 
-Already built in: 18+ age check, consent recorded at sign-up, row-level security (each person's data is visible only to
+Already built in: 18+ age check, Privacy Policy and Terms with recorded consent (asked again when they change), account deletion (withdraws consent), row-level security (each person's data is visible only to
 their team), an audit trail of changes in Notes, a log of therapist views, data download, and full deletion.
 
 ---
