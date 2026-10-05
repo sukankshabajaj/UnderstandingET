@@ -176,7 +176,11 @@ export function Settings() {
           <T size={14} color={colors.muted}>
             Signed in as {app.user?.email}
           </T>
-          {app.people.length > 1 ? <Btn label="Switch profile" variant="secondary" size="md" onPress={() => app.reset('clients')} /> : null}
+          {me.role === 'therapist' ? (
+            <Btn label="Your clients (switch or add)" icon="groups" variant="secondary" size="md" onPress={() => app.reset('clients')} />
+          ) : app.people.length > 1 ? (
+            <Btn label="Switch profile" variant="secondary" size="md" onPress={() => app.reset('clients')} />
+          ) : null}
           <Btn label="Sign out" icon="logout" variant="ghost" size="md" onPress={() => app.backend.signOut()} />
           <Btn
             label="Delete my account"

@@ -41,10 +41,11 @@ export function Overview() {
     const m = f && snap.members.find((x) => x.user_id === f.flagged_by);
     return m ? (m.role === 'therapist' ? 'therapist' : roleLabel(m).toLowerCase()) : 'support';
   };
-  const manyClients = app.people.filter((p) => p.role === 'therapist').length > 1 || (snap.me.role === 'therapist' && app.people.length > 1);
+  // Therapists always get a way back to their client list (to switch or add clients).
+  const manyClients = snap.me.role === 'therapist' || app.people.length > 1;
   return (
     <Col gap={18}>
-      {manyClients ? <BackLink label="All clients" onPress={() => app.reset('clients')} /> : null}
+      {manyClients ? <BackLink label={snap.me.role === 'therapist' ? 'All clients' : 'All profiles'} onPress={() => app.reset('clients')} /> : null}
       <Row gap={12} style={{ paddingTop: manyClients ? 0 : 8 }}>
         <View style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: tint(300), alignItems: 'center', justifyContent: 'center' }}>
           <T bold size={18} color={deep(300)}>
