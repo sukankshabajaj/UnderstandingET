@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,0,0&display=block" rel="stylesheet"><style>body{margin:0;background:#ebe8e1;font-family:'Atkinson Hyperlegible',system-ui,sans-serif;color:#24221e;-webkit-font-smoothing:antialiased}a{color:oklch(0.42 0.08 255)}a:hover{color:oklch(0.32 0.08 255)}button{font-family:inherit;color:inherit}input{font-family:inherit}*{box-sizing:border-box}</style></helmet>
+<div style="min-height:100vh;display:flex;flex-wrap:wrap;gap:48px;align-items:center;justify-content:center;padding:40px 24px">
+  <div style="max-width:300px;display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#6b665d">Prototype</div>
+      <div style="font-size:34px;font-weight:700;line-height:1.1">Stepwise</div>
+      <div style="font-size:15px;line-height:1.5;color:#55514a;text-wrap:pretty">Track whether a support strategy is helping, and when it's time to try another one. For children and adults.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="font-size:13px;color:#6b665d">Person</div>
+      <div style="display:flex;gap:4px;padding:4px;background:#dedad1;border-radius:12px">
+        <sc-for list="{{ profiles }}" as="r" hint-placeholder-count="2">
+          <button onClick="{{ r.onClick }}" style="flex:1;border:none;border-radius:9px;padding:10px 6px;font-size:14px;font-weight:700;cursor:pointer;background:{{ r.bg }};color:{{ r.fg }};box-shadow:{{ r.shadow }}">{{ r.label }}</button>
+        </sc-for>
+      </div>
+      <div style="font-size:13px;color:#6b665d;padding-top:8px">View as</div>
+      <div style="display:flex;gap:4px;padding:4px;background:#dedad1;border-radius:12px">
+        <sc-for list="{{ roles }}" as="r" hint-placeholder-count="3">
+          <button onClick="{{ r.onClick }}" style="flex:1;border:none;border-radius:9px;padding:10px 6px;font-size:14px;font-weight:700;cursor:pointer;background:{{ r.bg }};color:{{ r.fg }};box-shadow:{{ r.shadow }}">{{ r.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+    <div style="font-size:14px;line-height:1.55;color:#55514a;text-wrap:pretty">{{ roleHelp }}</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <button onClick="{{ obHome }}" style="display:flex;align-items:center;gap:8px;border:1px solid #cfcac0;background:#f7f5f0;border-radius:12px;padding:12px 14px;font-size:14px;font-weight:700;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-weight:normal;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;font-feature-settings:'liga';-webkit-font-smoothing:antialiased;font-size:20px;">restart_alt</span>Show opening screens</button>
+      <button onClick="{{ togglePics }}" style="display:flex;align-items:center;gap:8px;border:1px solid #cfcac0;background:#f7f5f0;border-radius:12px;padding:12px 14px;font-size:14px;font-weight:700;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-weight:normal;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;font-feature-settings:'liga';-webkit-font-smoothing:antialiased;font-size:20px;">image</span>Picture mode: {{ picsLabel }}</button>
+    </div>
+  </div>
+
+  <div style="width:390px;height:844px;border-radius:52px;background:#1d1c1a;padding:11px;box-shadow:0 30px 60px rgba(40,35,25,.18)">
+    <div style="position:relative;width:100%;height:100%;border-radius:42px;overflow:hidden;background:#f7f5f0;display:flex;flex-direction:column">
+      <div style="height:48px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 30px;font-size:14px;font-weight:700">
+        <span>9:41</span><span style="width:96px;height:26px;border-radius:14px;background:#1d1c1a"></span><span style="font-size:12px">100%</span>
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:4px 20px 24px">
+
+        <sc-if value="{{ sWelcome }}" hint-placeholder-val="{{ false }}">
+          <div style="min-height:700px;display:flex;flex-direction:column;gap:36px;padding:36px 4px 4px">
+            <div style="display:flex;flex-direction:column;gap:16px">
+              <div style="width:76px;height:76px;border-radius:24px;background:oklch(0.94 0.035 175);color:oklch(0.42 0.08 175);display:flex;align-items:center;justify-content:center"><span style="font-family:'Material Symbols Rounded';font-weight:normal;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;font-feature-settings:'liga';-webkit-font-smoothing:antialiased;font-size:44px;">stairs</span></div>
+              <div style="font-size:38px;font-weight:700;line-height:1.05">Stepwise</div>
+              <div style="font-size:19px;line-height:1.45;color:#4a463f;text-wrap:pretty">Try a strategy, see if it helps, and know when it is time to switch.</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <sc-for list="{{ welcomeRows }}" as="w" hint-placeholder-count="3">
+                <div style="display:flex;align-items:center;gap:14px"><div style="width:48px;height:48px;flex:none;border-radius:14px;background:{{ w.tint }};color:{{ w.deep }};display:flex;align-items:center;justify-content:center"><span style="font-family:'Material Symbols Rounded';font-weight:normal;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;font-feature-settings:'liga';-webkit-font-smoothing:antialiased;font-size:26px">{{ w.icon }}</span></div><div style="font-size:16px;font-weight:700">{{ w.label }}</div></div>
+              </sc-for>
+            </div>
+            <div style="margin-top:auto;display:flex;flex-direction:column;gap:10px">
+              <button onClick="{{ obStart }}" style="border:none;border-radius:18px;padding:18px;font-size:18px;font-weight:700;background:#24221e;color:#fff;cursor:pointer">Get started</button>
+              <button onClick="{{ obInvite }}" style="border:1.5px solid #24221e;background:#fff;border-radius:18px;padding:17px;font-size:17px;font-weight:700;cursor:pointer">I have an invite code</button>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ sInvite }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:20px;min-height:700px"><button onClick="{{ obHome }}" aria-label="Back" style="width:44px;height:44px;border:none;background:none;cursor:pointer;padding:0;display:flex;align-items:center"><span style="font-family:'Material Symbols Rounded';font-weight:normal;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;font-feature-settings:'liga';-webkit-font-smoothing:antialiased;font-size:24px;">arrow_back</span></button>
+            <div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:26px;font-weight:700;line-height:1.2">Join a team</div><div style="font-size:15px;color:#6b665d;line-height:1.45">Enter the 6-digit code from the person who made the profile.</div></div>
+            <input value="{{ inviteCode }}" onChange="{{ onInvite }}" inputmode="numeric" maxlength="6" placeholder="000000" style="border:1px solid #d6d1c6;background:#fff;border-radius:14px;padding:14px;font-size:16px;outline:none;font-size:30px;letter-spacing:.3em;text-align:center;font-weight:700">
+            <div style="font-size:14px;color:#6b665d">For this prototype, any 6 digits will join Maya's team as a parent.</div>
+            <button onClick="{{ obJoin }}" style="margin-top:auto;border:none;border-radius:18px;padding:18px;font-size:18px;font-weight:700;background:#24221e;color:#fff;cursor:pointer;background:{{ joinBg }}">Join</button></div>
+        </sc-if>
+        <sc-if value="{{ sWho }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:20px;min-height:700px"><div style="display:flex;align-items:center;gap:12px;padding-top:4px"><button onClick="{{ obBack }}" aria-label="Back" style="width:44px;height:44px;flex:none;border:none;background:none;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center"><span style="font-family:'Material Symbols Rounded';font-weight:normal;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;font-feature-settings:'liga';-webkit-font-smoothing:antialiased;font-size:24px;">arrow_back</span></button><div style="flex:1;display:flex;gap:4px"><sc-for list="{{ obSteps }}" as="b" hint-placeholder-count="5"><div style="flex:1;height:6px;border-radius:3px;background:{{ b.bg }}"></div></sc-for></div><div style="width:44px"></div></div><div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:26px;font-weight:700;line-height:1.2">Who is this profile for?</div><div style="font-size:15px;color:#6b665d;line-height:1.45">You can add more people later.</div></div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <sc-for list="{{ whoOpts }}" as="o" hint-placeholder-count="3">
+                <button onClick="{{ o.onClick }}" style="display:flex;align-items:center;gap:14px;border:2px solid {{ o.border }};background:{{ o.bg }};border-radius:18px;padding:16px;cursor:pointer;text-align:left">
+                  <div style="width:52px;height:52px;flex:none;border-radius:16px;background:{{ o.tint }};color:{{ o.deep }};display:flex;align-items:center;justify-content:center"><span style="font-family:'Material Symbols Rounded';font-weight:normal;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;font-feature-settings:'liga';-webkit-font-smoothing:antialiased;font-size:28px">{{ o.icon }}</span></div>
+                  <div style="display:flex;flex-direction:column;gap:3px;min-width:0"><div style="font-size:17px;font-weight:700">{{ o.label }}</div><div style="font-size:14px;color:#6b665d;line-height:1.4">{{ o.sub }}</div></div>
+                </button>
+              </sc-for>
+            </div>
+            <div style="background:#efece5;border-radius:16px;padding:14px;font-size:14px;line-height:1.5;color:#4a463f">A child's profile is made by a parent or therapist. Adults can make their own and choose who to invite.</div>
+            <button onClick="{{ obNext }}" style="margin-top:auto;border:none;border-radius:18px;padding:18px;font-size:18px;font-weight:700;background:#24221e;color:#fff;cursor:pointer;background:{{ obNextBg }}">Continue</button></div>
+        </sc-if>
+        <sc-if value="{{ sProfile }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:20px;min-height:700px"><div style="display:flex;align-items:center;gap:12px;padding-top:4px"><button onClick="{{ obBack }}" aria-label="Back" style="width:44px;height:44px;flex:none;border:none;background:none;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center"><span style="font-family:'Material Symbols Rounded';font-weight:normal;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;font-feature-settings:'liga';-webkit-font-smoothing:antialiased;font-size:24px;">arrow_back</span></button><div style="flex:1;display:flex;gap:4px"><sc-for list="{{ obSteps }}" as="b" hint-placeholder-count="5"><div style="flex:1;height:6px;border-radius:3px;background:{{ b.bg }}"></div></sc-for></div><div style="width:44px"></div></div><div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:26px;font-weight:700;line-height:1.2">{{ obProfTitle }}</div></div>
+            <div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:14px;font-weight:700">First name</div><input value="{{ obName }}" onChange="{{ onObName }}" placeholder="e.g. Maya" style="border:1px solid #d6d1c6;background:#fff;border-radius:14px;padding:14px;font-size:16px;outline:none"></div>
+            <div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:14px;font-weight:700">Age</div><div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px"><sc-for list="{{ ageOpts }}" as="a" hint-placeholder-count="4"><button onClick="{{ a.onClick }}" style="border:2px solid {{ a.border }};background:{{ a.bg }};border-radius:12px;padding:12px 4px;font-size:15px;font-weight:700;cursor:pointer;min-height:48px">{{ a.label }}</button></sc-for></div></div>
+            <div style="display:flex;flex-direction:column;gap:6px"><div style="display:flex;gap:6px;align-items:baseline"><div style="font-size:14px;font-weight:700">Diagnosis or support needs</div><div style="font-size:13px;color:#6b665d">optional</div></div><div style="display:flex;flex-wrap:wrap;gap:8px"><sc-for list="{{ dxOpts }}" as="d" hint-placeholder-count="4"><button onClick="{{ d.onClick }}" style="border:2px solid {{ d.border }};background:{{ d.bg }};border-radius:12px;padding:10px 14px;font-size:15px;font-weight:700;cursor:pointer;min-height:44px">{{ d.label }}</button></sc-for></div></div>
+            <button onClick="{{ obNext }}" style="margin-top:auto;border:none;border-radius:18px;padding:18px;font-size:18px;font-weight:700;background:#24221e;color:#fff;cursor:pointer;background:{{ obNextBg }}">Continue</button></div>
+        </sc-if>
+        <sc-if value="{{ sNeeds }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:20px;min-height:700px"><div style="display:flex;align-items:center;gap:12px;padding-top:4px"><button onClick="{{ obBack }}" aria-label="Back" style="width:44px;height:44px;flex:none;border:none;background:none;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center"><span style="font-family:'Material Symbols Rounded';font-weight:normal;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;font-feature-settings:'liga';-webkit-font-smoothing:antialiased;font-size:24px;">arrow_back</span></button><div style="flex:1;display:flex;gap:4px"><sc-for list="{{ obSteps }}" as="b" hint-placeholder-count="5"><div style="flex:1;height:6px;border-radius:3px;background:{{ b.bg }}"></div></sc-for></div><div style="width:44px"></div></div><div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:26px;font-weight:700;line-height:1.2">What's hard right now?</div><div style="font-size:15px;color:#6b665d;line-height:1.45">Pick any that apply. This helps choose the first strategies to try.</div></div>
+            <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px"><sc-for list="{{ needOpts }}" as="n" hint-placeholder-count="4"><button onClick="{{ n.onClick }}" style="display:flex;align-items:center;gap:10px;border:2px solid {{ n.border }};background:{{ n.bg }};border-radius:14px;padding:12px;cursor:pointer;text-align:left;min-height:56px;min-width:0"><span style="font-family:'Material Symbols Rounded';font-weight:normal;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;font-feature-settings:'liga';-webkit-font-smoothing:antialiased;font-size:24px;color:{{ n.fg }}">{{ n.icon }}</span><span style="font-size:15px;font-weight:700;min-width:0">{{ n.label }}</span></button></sc-for></div>
+            <div style="font-size:14px;font-weight:700;padding-top:4px">What should we track?</div>
+            <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px"><sc-for list="{{ obAreaOpts }}" as="a" hint-placeholder-count="4"><button onClick="{{ a.onClick }}" style="display:flex;align-items:center;gap:10px;border:2px solid {{ a.border }};background:{{ a.bg }};border-radius:14px;padding:12px;cursor:pointer;text-align:left;min-height:56px;min-width:0"><span style="font-family:'Material Symbols Rounded';font-weight:normal;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;font-feature-settings:'liga';-webkit-font-smoothing:antialiased;font-size:24px;color:{{ a.fg }}">{{ a.icon }}</span><span style="font-size:15px;font-weight:700;min-width:0">{{ a.label }}</span></button></sc-for></div>
+            <button onClick="{{ obNext }}" style="margin-top:auto;border:none;border-radius:18px;padding:18px;font-size:18px;font-weight:700;background:#24221e;color:#fff;cursor:pointer;background:{{ obNextBg }}">Continue</button></div>
+        </sc-if>
+        <sc-if value="{{ sAccess }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:20px;min-height:700px"><div style="display:flex;align-items:center;gap:12px;padding-top:4px"><button onClick="{{ obBack }}" aria-label="Back" style="width:44px;height:44px;flex:none;border:none;background:none;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center"><span style="font-family:'Material Symbols Rounded';font-weight:normal;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;font-feature-settings:'liga';-webkit-font-smoothing:antialiased;font-size:24px;">arrow_back</span></button><div style="flex:1;display:flex;gap:4px"><sc-for list="{{ obSteps }}" as="b" hint-placeholder-count="5"><div style="flex:1;height:6px;border-radius:3px;background:{{ b.bg }}"></div></sc-for></div><div style="width:44px"></div></div><div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:26px;font-weight:700;line-height:1.2">How should the app work for {{ obNameOr }}?</div><div style="font-size:15px;color:#6b665d;line-height:1.45">You can change these any time in settings.</div></div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <sc-for list="{{ accOpts }}" as="a" hint-placeholder-count="3">
+                <button onClick="{{ a.onClick }}" style="display:flex;align-items:center;gap:14px;border:1px solid #e4e0d7;background:#fff;border-radius:18px;padding:14px;cursor:pointer;text-align:left">
+                  <div style="width:48px;height:48px;flex:none;border-radius:14px;background:#efece5;display:flex;align-items:center;justify-content:center"><span style="font-family:'Material Symbols Rounded';font-weight:normal;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;font-feature-settings:'liga';-webkit-font-smoothing:antialiased;font-size:26px">{{ a.icon }}</span></div>
+                  <div style="flex:1;display:flex;flex-direction:column;gap:2px;min-width:0"><div style="font-size:16px;font-weight:700">{{ a.label }}</div><div style="font-size:13px;color:#6b665d;line-height:1.4">{{ a.sub }}</div></div>
+                  <div style="width:50px;height:30px;flex:none;border-radius:15px;background:{{ a.track }};padding:3px;display:flex;justify-content:{{ a.justify }}"><div style="width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2)"></div></div>
+                </button>
+              </sc-for>
+            </div>
+            <button onClick="{{ obNext }}" style="margin-top:auto;border:none;border-radius:18px;padding:18px;font-size:18px;font-weight:700;background:#24221e;color:#fff;cursor:pointer;background:{{ obNextBg }}">Continue</button></div>
+        </sc-if>
+        <sc-if value="{{ sTeam }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:20px;min-height:700px"><div style="display:flex;align-items:center;gap:12px;padding-top:4px"><button onClick="{{ obBack }}" aria-label="Back" style="width:44px;height:44px;flex:none;border:none;background:none;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center"><span style="font-family:'Material Symbols Rounded';font-weight:normal;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;font-feature-settings:'liga';-webkit-font-smoothing:antialiased;font-size:24px;">arrow_back</span></button><div style="flex:1;display:flex;gap:4px"><sc-for list="{{ obSteps }}" as="b" hint-placeholder-count="5"><div style="flex:1;height:6px;border-radius:3px;background:{{ b.bg }}"></div></sc-for></div><div style="width:44px"></div></div><div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:26px;font-weight:700;line-height:1.2">Invite the team</div><div style="font-size:15px;color:#6b665d;line-height:1.45">They'll get a code to join. You can also do this later.</div></div>
+            <div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:14px;font-weight:700">Therapist's email</div><input value="{{ obTher }}" onChange="{{ onObTher }}" placeholder="name@clinic.com" style="border:1px solid #d6d1c6;background:#fff;border-radius:14px;padding:14px;font-size:16px;outline:none"></div>
+            <div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:14px;font-weight:700">{{ obSupLabel }}</div><input value="{{ obSup }}" onChange="{{ onObSup }}" placeholder="name@email.com" style="border:1px solid #d6d1c6;background:#fff;border-radius:14px;padding:14px;font-size:16px;outline:none"></div>
+            <div style="display:flex;gap:10px;align-items:flex-start;background:#efece5;border-radius:16px;padding:14px"><span style="font-family:'Material Symbols Rounded';font-weight:normal;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;font-feature-settings:'liga';-webkit-font-smoothing:antialiased;font-size:22px;color:#55514a">visibility</span><div style="font-size:14px;line-height:1.5;color:#4a463f">Everyone on the team can see tasks, check-ins, feelings and notes, and can add tasks.</div></div>
+            <div style="margin-top:auto;display:flex;flex-direction:column;gap:8px"><button onClick="{{ obNext }}" style="border:none;border-radius:18px;padding:18px;font-size:18px;font-weight:700;background:#24221e;color:#fff;cursor:pointer">Continue</button><button onClick="{{ obNext }}" style="border:none;background:none;padding:12px;font-size:16px;font-weight:700;cursor:pointer;color:#55514a">Skip for now</button></div></div>
+        </sc-if>
+        <sc-if value="{{ sReady }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:20px;min-height:700px"><div style="display:flex;flex-direction:column;gap:16px;align-items:flex-start;padding-top:40px">
+              <div style="width:76px;height:76px;border-radius:50%;background:oklch(0.94 0.035 150);color:oklch(0.42 0.08 150);display:flex;align-items:center;justify-content:center"><span style="font-family:'Material Symbols Rounded';font-weight:normal;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;font-feature-settings:'liga';-webkit-font-smoothing:antialiased;font-size:44px;">check</span></div>
+              <div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:26px;font-weight:700;line-height:1.2">{{ obNameOr }}'s profile is ready</div></div>
+            </div>
+            <div style="background:#fff;border:1px solid #e4e0d7;border-radius:18px;padding:4px 16px;display:flex;flex-direction:column">
+              <sc-for list="{{ obSummary }}" as="r" hint-placeholder-count="4">
+                <div style="display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #eeebe4;font-size:15px"><span style="color:#6b665d">{{ r.k }}</span><span style="font-weight:700;text-align:right">{{ r.v }}</span></div>
+              </sc-for>
+            </div>
+            <button onClick="{{ obFinish }}" style="margin-top:auto;border:none;border-radius:18px;padding:18px;font-size:18px;font-weight:700;background:#24221e;color:#fff;cursor:pointer">Open Stepwise</button></div>
+        </sc-if>
+
+        <sc-if value="{{ sToday }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:20px">
+            <div style="display:flex;flex-direction:column;gap:4px;padding-top:8px">
+              <div style="font-size:15px;color:#6b665d">Thursday, October 8</div>
+              <div style="font-size:30px;font-weight:700">{{ p.hi }}</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;justify-content:space-between;font-size:15px"><span style="font-weight:700">{{ doneLabel }}</span><span style="color:#6b665d">today</span></div>
+              <div style="display:flex;gap:4px">
+                <sc-for list="{{ segs }}" as="s" hint-placeholder-count="5"><div style="flex:1;height:10px;border-radius:5px;background:{{ s.bg }}"></div></sc-for>
+              </div>
+            </div>
+            <div style="background:#fff;border:1px solid #e4e0d7;border-radius:20px;padding:14px;display:flex;flex-direction:column;gap:10px">
+              <div style="font-size:15px;font-weight:700">How are you feeling?</div>
+              <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px">
+                <sc-for list="{{ feelChips }}" as="c" hint-placeholder-count="6"><button onClick="{{ c.onClick }}" style="display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;border:none;background:{{ c.tint }};border-radius:12px;padding:10px 4px;font-size:13px;font-weight:700;cursor:pointer;min-height:56px;text-align:center"><span style="font-family:'Material Symbols Rounded';font-weight:normal;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;font-feature-settings:'liga';-webkit-font-smoothing:antialiased;font-size:26px;color:{{ c.deep }}">{{ c.icon }}</span>{{ c.label }}</button></sc-for>
+              </div>
+            </div>
+            <sc-if value="{{ hasNext }}" hint-placeholder-val="{{ true }}">
+              <div style="background:{{ next.tint }};border-radius:24px;padding:20px;display:flex;flex-direction:column;gap:14px">
+                <div style="display:flex;justify-content:space-between;align-items:center;min-height:24px"><div style="font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:{{ next.deep }}">Up next</div><sc-if value="{{ readAloud }}" hint-placeholder-val="{{ false }}"><button onClick="{{ next.speak }}" aria-label="Read aloud" style="width:44px;height:44px;border:none;border-radius:50%;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;margin:-10px -6px"><span style="font-family:'Material Symbols Rounded';font-weight:normal;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;font-feature-settings:'liga';-webkit-font-smoothing:antialiased;font-size:24px;">volume_up</span></button></sc-if></div>
+                <div style="display:flex;flex-direction:column;gap:4px">
+                  <div style="font-size:24px;font-weight:700">{{ next.title }}</div>
+                  <div style="font-size:15px;color:#4a463f">Strategy: {{ next.stratName }}</div>
+                </div>
+                <button onClick="{{ next.open }}" style="border:none;border-radius:16px;padding:16px;font-size:17px;font-weight:700;background:#24221e;color:#fff;cursor:pointer">Start</button>
+              </div>
+            </sc-if>
+            <sc-if value="{{ allDone }}" hint-placeholder-val="{{ false }}">
+              <div style="background:oklch(0.94 0.035 150);border-radius:24px;padding:20px;font-size:18px;font-weight:700">All done for today.</div>
+            </sc-if>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:15px;font-weight:700">Today's plan</div><button onClick="{{ openAdd }}" style="border:none;background:#24221e;color:#fff;border-radius:10px;padding:8px 14px;font-size:14px;font-weight:700;cursor:pointer;min-height:36px">+ Add task</button></div>
+              <sc-for list="{{ taskRows }}" as="t" hint-placeholder-count="5">
+                <div style="display:flex;align-items:center;gap:6px;border:1px solid #e4e0d7;background:#fff;border-radius:18px;padding:6px 6px 6px 14px;opacity:{{ t.opacity }}"><button onClick="{{ t.open }}" style="flex:1;min-width:0;display:flex;align-items:center;gap:14px;text-align:left;border:none;background:none;padding:6px 0;cursor:pointer">
+                  <div style="width:44px;height:44px;flex:none;border-radius:14px;background:{{ t.tint }};color:{{ t.deep }};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:17px"><span style="font-family:'Material Symbols Rounded';font-weight:normal;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;font-feature-settings:'liga';-webkit-font-smoothing:antialiased;font-size:26px">{{ t.icon }}</span></div>
+                  <div style="flex:1;display:flex;flex-direction:column;gap:2px;min-width:0">
+                    <div style="font-size:16px;font-weight:700">{{ t.title }}</div>
+                    <sc-if value="{{ words }}" hint-placeholder-val="{{ true }}"><div style="font-size:13px;color:#6b665d">{{ t.stratName }}</div></sc-if>
+                  </div>
+                  </button><button onClick="{{ t.tick }}" aria-label="Tick task" style="width:48px;height:48px;flex:none;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0"><div style="width:28px;height:28px;flex:none;border-radius:50%;border:2px solid {{ t.checkBorder }};background:{{ t.checkBg }};color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700">{{ t.check }}</div></button></div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ sTask }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:20px">
+            <button onClick="{{ goToday }}" style="align-self:flex-start;border:none;background:none;padding:8px 0;font-size:16px;font-weight:700;cursor:pointer">← Back</button>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <span style="align-self:flex-start;padding:4px 10px;border-radius:8px;font-size:13px;font-weight:700;background:{{ cur.tint }};color:{{ cur.deep }}">{{ cur.areaName }}</span>
+              <div style="font-size:28px;font-weight:700">{{ cur.title }}</div>
+            </div>
+            <div style="background:#fff;border:1px solid #e4e0d7;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:4px">
+              <div style="font-size:13px;color:#6b665d">Your strategy</div>
+              <div style="font-size:18px;font-weight:700">{{ cur.stratName }}</div>
+              <div style="font-size:14px;color:#55514a;line-height:1.45">{{ cur.desc }}</div>
+              <div style="font-size:13px;color:#6b665d;padding-top:4px">{{ cur.freqText }} · {{ cur.remText }}</div>
+            </div>
+            <sc-if value="{{ cur.hasTimer }}" hint-placeholder-val="{{ false }}">
+              <div style="background:{{ cur.tint }};border-radius:20px;padding:18px;display:flex;align-items:center;justify-content:space-between">
+                <div style="display:flex;flex-direction:column;gap:2px"><div style="font-size:13px;color:{{ cur.deep }};font-weight:700">Work timer</div><div style="font-size:40px;font-weight:700;font-variant-numeric:tabular-nums">{{ timerText }}</div></div>
+                <button onClick="{{ toggleTimer }}" style="border:none;border-radius:14px;padding:14px 20px;font-size:16px;font-weight:700;background:#24221e;color:#fff;cursor:pointer">{{ timerBtn }}</button>
+              </div>
+            </sc-if>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <sc-if value="{{ cur.hasSteps }}" hint-placeholder-val="{{ true }}"><div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:15px;font-weight:700">Steps</div><sc-if value="{{ readAloud }}" hint-placeholder-val="{{ false }}"><button onClick="{{ speakSteps }}" style="display:flex;align-items:center;gap:6px;border:1.5px solid #24221e;background:#fff;border-radius:12px;padding:8px 12px;font-size:14px;font-weight:700;cursor:pointer;min-height:44px"><span style="font-family:'Material Symbols Rounded';font-weight:normal;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;font-feature-settings:'liga';-webkit-font-smoothing:antialiased;font-size:20px;">volume_up</span>Read aloud</button></sc-if></div></sc-if>
+              <sc-for list="{{ stepRows }}" as="s" hint-placeholder-count="4">
+                <button onClick="{{ s.onClick }}" style="display:flex;align-items:center;gap:14px;text-align:left;border:1px solid #e4e0d7;background:#fff;border-radius:16px;padding:14px;cursor:pointer;min-height:56px">
+                  <div style="width:28px;height:28px;flex:none;border-radius:8px;border:2px solid {{ s.border }};background:{{ s.bg }};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700">{{ s.mark }}</div>
+                  <div style="font-size:16px;text-decoration:{{ s.deco }};color:{{ s.color }}">{{ s.text }}</div>
+                </button>
+              </sc-for>
+            </div>
+            <button onClick="{{ goCheckin }}" style="border:none;border-radius:18px;padding:18px;font-size:18px;font-weight:700;background:#24221e;color:#fff;cursor:pointer">I'm done</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ sCheckin }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:24px">
+            <button onClick="{{ backToTask }}" style="align-self:flex-start;border:none;background:none;padding:8px 0;font-size:16px;font-weight:700;cursor:pointer">← Back</button>
+            <div style="font-size:26px;font-weight:700;line-height:1.2">{{ cur.title }}: how did it go?</div>
+            <div style="display:flex;gap:10px">
+              <sc-for list="{{ feelOpts }}" as="o" hint-placeholder-count="3">
+                <button onClick="{{ o.onClick }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:10px;border:2px solid {{ o.border }};background:{{ o.bg }};border-radius:20px;padding:16px 6px;cursor:pointer">
+                  <div style="width:52px;height:52px;border-radius:50%;background:{{ o.tint }};color:{{ o.deep }};display:flex;align-items:center;justify-content:center"><span style="font-family:'Material Symbols Rounded';font-weight:normal;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;font-feature-settings:'liga';-webkit-font-smoothing:antialiased;font-size:34px">{{ o.icon }}</span></div>
+                  <div style="font-size:16px;font-weight:700">{{ o.label }}</div>
+                </button>
+              </sc-for>
+            </div>
+            <div style="font-size:20px;font-weight:700;line-height:1.3">Did "{{ cur.stratName }}" help?</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <sc-for list="{{ helpOpts }}" as="o" hint-placeholder-count="3">
+                <button onClick="{{ o.onClick }}" style="display:flex;align-items:center;gap:12px;border:2px solid {{ o.border }};background:{{ o.bg }};border-radius:16px;padding:14px 16px;font-size:17px;font-weight:700;cursor:pointer;text-align:left;min-height:56px">
+                  <span style="font-family:'Material Symbols Rounded';font-weight:normal;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;font-feature-settings:'liga';-webkit-font-smoothing:antialiased;font-size:28px;color:{{ o.deep }}">{{ o.icon }}</span>{{ o.label }}
+                </button>
+              </sc-for>
+            </div>
+            <button onClick="{{ saveCheckin }}" style="border:none;border-radius:18px;padding:18px;font-size:18px;font-weight:700;background:{{ saveBg }};color:#fff;cursor:pointer">Save</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ sProgress }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:18px">
+            <div style="font-size:28px;font-weight:700;padding-top:8px">My week</div>
+            <sc-for list="{{ areaRows }}" as="a" hint-placeholder-count="3">
+              <div style="background:#fff;border:1px solid #e4e0d7;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:12px">
+                <div style="display:flex;justify-content:space-between;align-items:baseline"><div style="font-size:17px;font-weight:700">{{ a.name }}</div><div style="font-size:14px;color:#6b665d">{{ a.count }}</div></div>
+                <div style="display:flex;gap:6px">
+                  <sc-for list="{{ a.days }}" as="d" hint-placeholder-count="7">
+                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px">
+                      <div style="width:100%;height:36px;border-radius:10px;background:{{ d.bg }};border:{{ d.border }}"></div>
+                      <div style="font-size:12px;color:#6b665d">{{ d.label }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="font-size:15px;font-weight:700">What's helping you</div>
+              <sc-for list="{{ helping }}" as="h" hint-placeholder-count="2">
+                <div style="display:flex;align-items:center;gap:12px;background:oklch(0.94 0.035 150);border-radius:16px;padding:14px">
+                  <div style="width:12px;height:12px;border-radius:50%;background:oklch(0.62 0.11 150)"></div>
+                  <div style="display:flex;flex-direction:column;gap:2px"><div style="font-size:16px;font-weight:700">{{ h.name }}</div><div style="font-size:13px;color:#4a463f">for {{ h.task }}</div></div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ sCalendar }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div style="display:flex;flex-direction:column;gap:4px;padding-top:8px"><div style="font-size:28px;font-weight:700">Tracker</div><div style="font-size:14px;color:#6b665d">How often each strategy got done</div></div>
+            <div style="display:flex;gap:4px;padding:4px;background:#ebe7df;border-radius:12px">
+              <sc-for list="{{ calModes }}" as="m" hint-placeholder-count="2"><button onClick="{{ m.onClick }}" style="flex:1;border:none;border-radius:9px;padding:10px;font-size:15px;font-weight:700;cursor:pointer;background:{{ m.bg }};color:{{ m.fg }};box-shadow:{{ m.shadow }}">{{ m.label }}</button></sc-for>
+            </div>
+            <sc-if value="{{ calWeek }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <button onClick="{{ prevWeek }}" style="width:44px;height:44px;border-radius:12px;border:1px solid #e4e0d7;background:#fff;font-size:20px;font-weight:700;cursor:pointer">‹</button>
+                  <div style="display:flex;flex-direction:column;align-items:center;gap:2px"><div style="font-size:17px;font-weight:700">{{ weekLabel }}</div><div style="font-size:13px;color:#6b665d">{{ weekRange }} · {{ weekTotal }}</div></div>
+                  <button onClick="{{ nextWeek }}" style="width:44px;height:44px;border-radius:12px;border:1px solid #e4e0d7;background:#fff;font-size:20px;font-weight:700;cursor:pointer;opacity:{{ nextOp }}">›</button>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;padding:0 15px">
+                  <sc-for list="{{ weekDays }}" as="d" hint-placeholder-count="7">
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:3px"><div style="font-size:12px;color:#6b665d">{{ d.l }}</div><div style="width:28px;height:28px;border-radius:50%;background:{{ d.bg }};color:{{ d.fg }};font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center">{{ d.n }}</div></div>
+                  </sc-for>
+                </div>
+                <sc-for list="{{ weekRows }}" as="r" hint-placeholder-count="5">
+                  <div style="background:#fff;border:1px solid #e4e0d7;border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:10px">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+                      <div style="display:flex;gap:10px;align-items:flex-start;min-width:0"><div style="width:10px;height:10px;border-radius:50%;flex:none;margin-top:6px;background:{{ r.dot }}"></div><div style="display:flex;flex-direction:column;gap:2px;min-width:0"><div style="font-size:16px;font-weight:700">{{ r.title }}</div><div style="font-size:13px;color:#6b665d">{{ r.strat }} · {{ r.freq }}</div></div></div>
+                      <div style="font-size:15px;font-weight:700;flex:none">{{ r.count }}</div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px">
+                      <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="7"><div style="aspect-ratio:1/1;border-radius:10px;background:{{ c.bg }};border:{{ c.border }};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:{{ c.mfg }}">{{ c.mark }}</div></sc-for>
+                    </div>
+                  </div>
+                </sc-for>
+                <div style="display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:#55514a">
+                  <sc-for list="{{ legend }}" as="g" hint-placeholder-count="3"><span style="display:flex;gap:5px;align-items:center"><span style="width:12px;height:12px;border-radius:4px;background:{{ g.bg }};border:{{ g.border }}"></span>{{ g.label }}</span></sc-for>
+                </div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ calMonth }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:14px">
+                <div style="font-size:17px;font-weight:700">October 2026</div>
+                <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px">
+                  <sc-for list="{{ dows }}" as="w" hint-placeholder-count="7"><div style="text-align:center;font-size:12px;color:#6b665d;padding-bottom:4px">{{ w }}</div></sc-for>
+                  <sc-for list="{{ cells }}" as="c" hint-placeholder-count="35">
+                    <button onClick="{{ c.onClick }}" style="aspect-ratio:1/1.1;border:{{ c.border }};background:{{ c.bg }};border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;padding:0;opacity:{{ c.opacity }}">
+                      <div style="font-size:15px;font-weight:700;color:{{ c.fg }}">{{ c.num }}</div>
+                      <div style="width:60%;height:4px;border-radius:2px;background:#e4e0d7;overflow:hidden;display:flex"><div style="width:{{ c.pct }};background:{{ c.bar }}"></div></div>
+                    </button>
+                  </sc-for>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:baseline"><div style="font-size:17px;font-weight:700">{{ selLabel }}</div><div style="font-size:14px;color:#6b665d">{{ selSummary }}</div></div>
+                <sc-for list="{{ agenda }}" as="g" hint-placeholder-count="4">
+                  <div style="display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #e4e0d7;border-radius:14px;padding:12px 14px">
+                    <div style="width:4px;align-self:stretch;border-radius:2px;background:{{ g.color }}"></div>
+                    <div style="flex:1;display:flex;flex-direction:column;gap:2px;min-width:0"><div style="font-size:15px;font-weight:700">{{ g.title }}</div><div style="font-size:12px;color:#6b665d">{{ g.sub }}</div></div>
+                    <div style="font-size:13px;font-weight:700;color:{{ g.stateColor }}">{{ g.state }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <button onClick="{{ openAdd }}" style="border:1.5px dashed #b9b4aa;background:transparent;border-radius:16px;padding:14px;font-size:16px;font-weight:700;cursor:pointer">+ Add task</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ sOverview }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:18px">
+            <div style="display:flex;align-items:center;gap:12px;padding-top:8px">
+              <div style="width:48px;height:48px;border-radius:50%;background:oklch(0.94 0.035 255);color:oklch(0.42 0.08 255);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px">{{ p.initial }}</div>
+              <div style="display:flex;flex-direction:column;gap:2px"><div style="font-size:22px;font-weight:700">{{ p.label }}</div><div style="font-size:13px;color:#6b665d">{{ roleSub }}</div></div>
+            </div>
+            <sc-for list="{{ alerts }}" as="a" hint-placeholder-count="1">
+              <button onClick="{{ a.open }}" style="display:flex;flex-direction:column;gap:6px;text-align:left;border:none;background:oklch(0.93 0.04 25);border-radius:18px;padding:16px;cursor:pointer">
+                <div style="font-size:13px;font-weight:700;color:oklch(0.42 0.1 25);letter-spacing:.04em;text-transform:uppercase">{{ a.kicker }}</div>
+                <div style="font-size:16px;font-weight:700;line-height:1.35">{{ a.text }}</div>
+                <div style="font-size:14px;color:oklch(0.42 0.1 25);font-weight:700">Review evidence →</div>
+              </button>
+            </sc-for>
+            <div style="background:#fff;border:1px solid #e4e0d7;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;justify-content:space-between;align-items:baseline"><div style="font-size:17px;font-weight:700">Today</div><div style="font-size:14px;color:#6b665d">{{ doneLabel }}</div></div>
+              <sc-if value="{{ hasFeelToday }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding-bottom:4px;border-bottom:1px solid #eeebe4">
+                  <span style="font-size:13px;color:#6b665d">Feelings logged</span>
+                  <sc-for list="{{ feelToday }}" as="c" hint-placeholder-count="1"><span style="display:flex;align-items:center;gap:5px;padding:4px 9px;border-radius:8px;font-size:13px;font-weight:700;background:{{ c.tint }}"><span style="width:8px;height:8px;border-radius:50%;background:{{ c.dot }}"></span>{{ c.label }}</span></sc-for>
+                </div>
+              </sc-if>
+              <sc-for list="{{ logRows }}" as="l" hint-placeholder-count="5">
+                <div style="display:flex;align-items:center;gap:12px">
+                  <div style="width:10px;height:10px;border-radius:50%;flex:none;background:{{ l.dot }}"></div>
+                  <div style="flex:1;display:flex;flex-direction:column;gap:1px;min-width:0"><div style="font-size:15px;font-weight:700">{{ l.title }}</div><div style="font-size:13px;color:#6b665d">{{ l.result }}</div></div>
+                  
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:17px;font-weight:700">Strategies</div><button onClick="{{ openAdd }}" style="border:none;background:#24221e;color:#fff;border-radius:10px;padding:8px 14px;font-size:14px;font-weight:700;cursor:pointer;min-height:36px">+ Add task</button></div>
+              <sc-for list="{{ stratRows }}" as="s" hint-placeholder-count="5">
+                <button onClick="{{ s.open }}" style="display:flex;flex-direction:column;gap:10px;text-align:left;border:1px solid #e4e0d7;background:#fff;border-radius:18px;padding:14px;cursor:pointer">
+                  <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start">
+                    <div style="display:flex;flex-direction:column;gap:2px;min-width:0"><div style="font-size:16px;font-weight:700">{{ s.name }}</div><div style="font-size:13px;color:#6b665d">{{ s.task }} · {{ s.area }}</div></div>
+                    <span style="flex:none;padding:4px 10px;border-radius:8px;font-size:12px;font-weight:700;background:{{ s.chipBg }};color:{{ s.chipFg }}">{{ s.status }}</span>
+                  </div>
+                  <div style="display:flex;gap:3px">
+                    <sc-for list="{{ s.spark }}" as="b" hint-placeholder-count="14"><div style="flex:1;height:8px;border-radius:2px;background:{{ b.bg }}"></div></sc-for>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;font-size:12px;color:#6b665d"><span>Day {{ s.day }} of {{ s.len }}</span><span>Helped {{ s.rate }}</span></div>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ sStrategy }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:18px">
+            <button onClick="{{ goOverview }}" style="align-self:flex-start;border:none;background:none;padding:8px 0;font-size:16px;font-weight:700;cursor:pointer">← Overview</button>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div style="font-size:13px;color:#6b665d">{{ cur.title }} · {{ cur.areaName }}</div>
+              <div style="font-size:26px;font-weight:700;line-height:1.15">{{ cur.stratName }}</div>
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                <span style="padding:5px 12px;border-radius:8px;font-size:13px;font-weight:700;background:{{ st.chipBg }};color:{{ st.chipFg }}">{{ st.status }}</span>
+                <span style="font-size:13px;color:#6b665d">Started {{ cur.started }} · replaced {{ cur.prev }}</span>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div style="display:flex;justify-content:space-between;font-size:13px"><span style="font-weight:700">Trial: day {{ st.day }} of {{ st.len }}</span><span style="color:#6b665d">{{ st.left }}</span></div>
+              <div style="height:8px;border-radius:4px;background:#e4e0d7;overflow:hidden"><div style="height:100%;width:{{ st.trialPct }};background:#24221e"></div></div>
+            </div>
+            <div style="background:#fff;border:1px solid #e4e0d7;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:12px">
+              <div style="font-size:15px;font-weight:700">{{ p.rating }}</div>
+              <div style="position:relative;height:120px;display:flex;align-items:flex-end;gap:4px">
+                <div style="position:absolute;left:0;right:0;bottom:60%;border-top:1.5px dashed #9a948a"></div>
+                <sc-for list="{{ bars }}" as="b" hint-placeholder-count="14">
+                  <div style="flex:1;height:{{ b.h }};background:{{ b.bg }};border:{{ b.border }};border-radius:4px 4px 2px 2px"></div>
+                </sc-for>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:#55514a">
+                <span style="display:flex;gap:5px;align-items:center"><span style="width:10px;height:10px;border-radius:3px;background:oklch(0.68 0.11 150)"></span>Yes</span>
+                <span style="display:flex;gap:5px;align-items:center"><span style="width:10px;height:10px;border-radius:3px;background:oklch(0.78 0.11 75)"></span>A little</span>
+                <span style="display:flex;gap:5px;align-items:center"><span style="width:10px;height:10px;border-radius:3px;background:oklch(0.68 0.12 25)"></span>No</span>
+                <span style="display:flex;gap:5px;align-items:center"><span style="width:10px;height:10px;border-radius:3px;background:#dcd8cf"></span>Not done</span>
+                <span style="display:flex;gap:5px;align-items:center"><span style="width:14px;border-top:1.5px dashed #9a948a"></span>Target</span>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+              <sc-for list="{{ statTiles }}" as="t" hint-placeholder-count="3">
+                <div style="background:#fff;border:1px solid #e4e0d7;border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:2px">
+                  <div style="font-size:22px;font-weight:700;color:{{ t.color }}">{{ t.value }}</div>
+                  <div style="font-size:12px;color:#6b665d">{{ t.label }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="background:{{ st.ruleBg }};border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:6px">
+              <div style="font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#55514a">Switch rule</div>
+              <div style="font-size:15px;line-height:1.45">Review if "helped" stays under 60% after 10 days.</div>
+              <div style="font-size:15px;font-weight:700;line-height:1.4">{{ st.verdict }}</div>
+            </div>
+            <sc-if value="{{ isTherapist }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;gap:10px">
+                <button onClick="{{ keepGoing }}" style="flex:1;border:1.5px solid #24221e;background:#fff;border-radius:16px;padding:15px;font-size:16px;font-weight:700;cursor:pointer">Extend 7 days</button>
+                <button onClick="{{ openSheet }}" style="flex:1;border:none;background:#24221e;color:#fff;border-radius:16px;padding:15px;font-size:16px;font-weight:700;cursor:pointer">Switch strategy</button>
+              </div>
+            </sc-if>
+            <sc-if value="{{ isParent }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ toggleFlag }}" style="border:none;background:#24221e;color:#fff;border-radius:16px;padding:16px;font-size:16px;font-weight:700;cursor:pointer">{{ flagLabel }}</button>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ sNotes }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div style="font-size:28px;font-weight:700;padding-top:8px">Notes</div>
+            <div style="font-size:14px;color:#6b665d">{{ p.notesSub }}</div>
+            <button onClick="{{ openQuick }}" style="display:flex;align-items:center;justify-content:center;gap:8px;border:1.5px solid #24221e;background:#fff;border-radius:14px;padding:14px;font-size:16px;font-weight:700;cursor:pointer">Log a feeling</button>
+            <div style="display:flex;gap:8px">
+              <input value="{{ noteText }}" onChange="{{ onNote }}" placeholder="Add a note…" style="flex:1;border:1px solid #d6d1c6;background:#fff;border-radius:14px;padding:14px;font-size:15px;outline:none">
+              <button onClick="{{ addNote }}" style="border:none;background:#24221e;color:#fff;border-radius:14px;padding:0 18px;font-size:15px;font-weight:700;cursor:pointer">Post</button>
+            </div>
+            <sc-for list="{{ noteRows }}" as="n" hint-placeholder-count="3">
+              <div style="background:#fff;border:1px solid #e4e0d7;border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:6px">
+                <div style="display:flex;justify-content:space-between;font-size:13px"><span style="font-weight:700;color:{{ n.color }}">{{ n.who }}</span><span style="color:#6b665d">{{ n.when }}</span></div>
+                <sc-if value="{{ n.hasFeel }}" hint-placeholder-val="{{ false }}"><span style="align-self:flex-start;display:flex;align-items:center;gap:6px;padding:4px 10px;border-radius:8px;font-size:13px;font-weight:700;background:{{ n.feelTint }}"><span style="width:8px;height:8px;border-radius:50%;background:{{ n.feelDot }}"></span>Feeling {{ n.feelLower }}</span></sc-if>
+                <div style="font-size:15px;line-height:1.45">{{ n.text }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+
+      <sc-if value="{{ showNav }}" hint-placeholder-val="{{ true }}"><div style="flex:none;display:flex;justify-content:space-around;padding:10px 12px 26px;border-top:1px solid #e4e0d7;background:#f7f5f0">
+        <sc-for list="{{ nav }}" as="n" hint-placeholder-count="3">
+          <button onClick="{{ n.onClick }}" style="display:flex;flex-direction:column;align-items:center;gap:5px;border:none;background:none;cursor:pointer;min-width:72px;min-height:48px;padding:4px">
+            <div style="width:56px;height:30px;border-radius:15px;background:{{ n.pill }};display:flex;align-items:center;justify-content:center"><span style="font-family:'Material Symbols Rounded';font-weight:normal;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;font-feature-settings:'liga';-webkit-font-smoothing:antialiased;font-size:24px;color:{{ n.fg }}">{{ n.icon }}</span></div>
+            <div style="font-size:14px;font-weight:700;color:{{ n.fg }}">{{ n.label }}</div>
+          </button>
+        </sc-for>
+      </div></sc-if>
+
+      <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;left:20px;right:20px;bottom:100px;background:#24221e;color:#fff;border-radius:16px;padding:14px 16px;font-size:15px;font-weight:700;text-align:center">{{ toast }}</div>
+      </sc-if>
+
+      <sc-if value="{{ quick }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;background:rgba(30,28,24,.4);display:flex;flex-direction:column;justify-content:flex-end">
+          <div onClick="{{ closeQuick }}" style="flex:1"></div>
+          <div style="background:#f7f5f0;border-radius:28px 28px 0 0;padding:20px 20px 34px;display:flex;flex-direction:column;gap:14px">
+            <div style="width:40px;height:5px;border-radius:3px;background:#d6d1c6;align-self:center"></div>
+            <sc-if value="{{ qForm }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;flex-direction:column;gap:14px">
+                <div style="font-size:20px;font-weight:700">How are you feeling?</div>
+                <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+                  <sc-for list="{{ qOpts }}" as="o" hint-placeholder-count="6"><button onClick="{{ o.onClick }}" style="display:flex;flex-direction:column;align-items:center;gap:8px;border:2px solid {{ o.border }};background:{{ o.bg }};border-radius:16px;padding:14px 4px;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-weight:normal;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;font-feature-settings:'liga';-webkit-font-smoothing:antialiased;font-size:32px;color:{{ o.deep }}">{{ o.icon }}</span><span style="font-size:14px;font-weight:700">{{ o.label }}</span></button></sc-for>
+                </div>
+                <input value="{{ qNote }}" onChange="{{ onQNote }}" placeholder="Want to add a note? (optional)" style="border:1px solid #d6d1c6;background:#fff;border-radius:14px;padding:14px;font-size:16px;outline:none">
+                <button onClick="{{ saveQuick }}" style="border:none;border-radius:16px;padding:16px;font-size:17px;font-weight:700;background:{{ qBg }};color:#fff;cursor:pointer">Save</button>
+              </div>
+            </sc-if>
+            <sc-if value="{{ qDone }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:16px;align-items:center;text-align:center;padding:8px 4px 0">
+                <div style="width:72px;height:72px;border-radius:50%;background:{{ fb.tint }};display:flex;align-items:center;justify-content:center"><div style="width:36px;height:36px;border-radius:50%;background:{{ fb.dot }}"></div></div>
+                <div style="font-size:22px;font-weight:700">{{ fb.title }}</div>
+                <div style="font-size:16px;line-height:1.5;color:#3d3a34;text-wrap:pretty">{{ fb.text }}</div>
+                <div style="width:100%;background:{{ fb.tint }};border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:4px;text-align:left"><div style="font-size:13px;font-weight:700;color:#55514a">Try this</div><div style="font-size:16px;font-weight:700;line-height:1.4">{{ fb.tip }}</div></div>
+                <div style="font-size:13px;color:#6b665d">{{ fb.shared }}</div>
+                <button onClick="{{ closeQuick }}" style="width:100%;border:none;border-radius:16px;padding:16px;font-size:17px;font-weight:700;background:#24221e;color:#fff;cursor:pointer">Done</button>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ doneOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;background:rgba(30,28,24,.4);display:flex;flex-direction:column;justify-content:flex-end">
+          <div onClick="{{ closeDone }}" style="flex:1"></div>
+          <div style="background:#f7f5f0;border-radius:28px 28px 0 0;padding:20px 20px 34px;display:flex;flex-direction:column;gap:16px;align-items:center;text-align:center">
+            <div style="width:40px;height:5px;border-radius:3px;background:#d6d1c6"></div>
+            <div style="width:72px;height:72px;border-radius:50%;background:{{ dn.tint }};display:flex;align-items:center;justify-content:center"><div style="width:44px;height:44px;border-radius:50%;background:{{ dn.deep }};color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700">✓</div></div>
+            <div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:26px;font-weight:700">{{ dn.title }}</div><div style="font-size:17px;color:#3d3a34">Keep going! {{ dn.sub }}</div></div>
+            <sc-if value="{{ dn.ask }}" hint-placeholder-val="{{ true }}">
+              <div style="width:100%;background:#fff;border:1px solid #e4e0d7;border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px;text-align:left">
+                <div style="font-size:16px;font-weight:700">Want a reminder for {{ dn.task }} next time?</div>
+                <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px">
+                  <sc-for list="{{ dn.opts }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.onClick }}" style="display:flex;flex-direction:column;align-items:center;gap:2px;border:1.5px solid #d6d1c6;background:#fff;border-radius:12px;padding:10px 4px;cursor:pointer;min-height:56px"><span style="font-size:14px;font-weight:700">{{ o.label }}</span><span style="font-size:12px;color:#6b665d">{{ o.time }}</span></button></sc-for>
+                </div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ dn.has }}" hint-placeholder-val="{{ false }}"><div style="font-size:14px;color:#6b665d">{{ dn.remLine }}</div></sc-if>
+            <button onClick="{{ closeDone }}" style="width:100%;border:none;border-radius:16px;padding:16px;font-size:17px;font-weight:700;background:#24221e;color:#fff;cursor:pointer">{{ dn.btn }}</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ addOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;background:rgba(30,28,24,.4);display:flex;flex-direction:column;justify-content:flex-end">
+          <div onClick="{{ closeAdd }}" style="flex:1;min-height:40px"></div>
+          <div style="background:#f7f5f0;border-radius:28px 28px 0 0;padding:20px 20px 34px;display:flex;flex-direction:column;gap:16px;max-height:88%;overflow-y:auto">
+            <div style="width:40px;height:5px;border-radius:3px;background:#d6d1c6;align-self:center;flex:none"></div>
+            <div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:20px;font-weight:700">New task</div><div style="font-size:14px;color:#6b665d;line-height:1.4">{{ addSub }}</div></div>
+            <div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:14px;font-weight:700">Task</div><input value="{{ addTitle }}" onChange="{{ onAddTitle }}" placeholder="e.g. Clothes ready before sleep" style="border:1px solid #d6d1c6;background:#fff;border-radius:14px;padding:14px;font-size:16px;outline:none"></div>
+            <div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:14px;font-weight:700">Area</div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px"><sc-for list="{{ addAreas }}" as="a" hint-placeholder-count="4"><button onClick="{{ a.onClick }}" style="border:2px solid {{ a.border }};background:{{ a.bg }};border-radius:12px;padding:10px 12px;font-size:14px;font-weight:700;cursor:pointer;min-height:44px">{{ a.label }}</button></sc-for></div></div>
+            <div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:14px;font-weight:700">Strategy to try</div><input value="{{ addStrat }}" onChange="{{ onAddStrat }}" placeholder="e.g. Lay clothes on the chair" style="border:1px solid #d6d1c6;background:#fff;border-radius:14px;padding:14px;font-size:16px;outline:none"></div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div style="display:flex;gap:6px;align-items:baseline"><div style="font-size:14px;font-weight:700">Steps to follow</div><div style="font-size:13px;color:#6b665d">optional</div></div>
+              <sc-for list="{{ addStepRows }}" as="st" hint-placeholder-count="1">
+                <div style="display:flex;gap:6px;align-items:center">
+                  <div style="width:24px;flex:none;font-size:14px;font-weight:700;color:#6b665d;text-align:center">{{ st.num }}</div>
+                  <input value="{{ st.value }}" onChange="{{ st.onChange }}" placeholder="{{ st.ph }}" style="flex:1;min-width:0;border:1px solid #d6d1c6;background:#fff;border-radius:12px;padding:12px;font-size:15px;outline:none">
+                  <button onClick="{{ st.remove }}" aria-label="Remove step" style="width:44px;height:44px;flex:none;border:none;background:none;font-size:20px;color:#6b665d;cursor:pointer">×</button>
+                </div>
+              </sc-for>
+              <button onClick="{{ addStepRow }}" style="align-self:flex-start;border:none;background:none;padding:8px 0;font-size:15px;font-weight:700;cursor:pointer">+ Add a step</button>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:14px;font-weight:700">How often</div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px"><sc-for list="{{ freqOpts }}" as="fq" hint-placeholder-count="4"><button onClick="{{ fq.onClick }}" style="border:2px solid {{ fq.border }};background:{{ fq.bg }};border-radius:12px;padding:10px 12px;font-size:14px;font-weight:700;cursor:pointer;min-height:44px">{{ fq.label }}</button></sc-for></div></div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div style="display:flex;gap:6px;align-items:baseline"><div style="font-size:14px;font-weight:700">Choose days</div><div style="font-size:13px;color:#6b665d">optional</div></div>
+              <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px">
+                <sc-for list="{{ dayOpts }}" as="d" hint-placeholder-count="7"><button onClick="{{ d.onClick }}" style="height:44px;border:2px solid {{ d.border }};background:{{ d.bg }};color:{{ d.fg }};border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;padding:0">{{ d.label }}</button></sc-for>
+              </div>
+              <div style="font-size:13px;color:#6b665d">{{ freqHint }}</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:14px;font-weight:700">Reminder</div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px"><sc-for list="{{ remOpts }}" as="rm" hint-placeholder-count="4"><button onClick="{{ rm.onClick }}" style="border:2px solid {{ rm.border }};background:{{ rm.bg }};border-radius:12px;padding:10px 12px;font-size:14px;font-weight:700;cursor:pointer;min-height:44px">{{ rm.label }}</button></sc-for></div></div>
+            <button onClick="{{ addTask }}" style="flex:none;border:none;border-radius:16px;padding:16px;font-size:17px;font-weight:700;background:{{ addBg }};color:#fff;cursor:pointer">Add task</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ sheet }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;background:rgba(30,28,24,.4);display:flex;flex-direction:column;justify-content:flex-end">
+          <div onClick="{{ closeSheet }}" style="flex:1"></div>
+          <div style="background:#f7f5f0;border-radius:28px 28px 0 0;padding:20px 20px 34px;display:flex;flex-direction:column;gap:12px">
+            <div style="width:40px;height:5px;border-radius:3px;background:#d6d1c6;align-self:center"></div>
+            <div style="font-size:20px;font-weight:700">Replace {{ cur.stratName }}</div>
+            <div style="font-size:14px;color:#6b665d">Starts a new 14-day trial for {{ cur.title }}.</div>
+            <sc-for list="{{ alts }}" as="a" hint-placeholder-count="3">
+              <button onClick="{{ a.onClick }}" style="display:flex;flex-direction:column;gap:3px;text-align:left;border:2px solid {{ a.border }};background:#fff;border-radius:16px;padding:14px;cursor:pointer">
+                <div style="font-size:16px;font-weight:700">{{ a.name }}</div>
+                <div style="font-size:13px;color:#6b665d;line-height:1.4">{{ a.desc }}</div>
+              </button>
+            </sc-for>
+            <button onClick="{{ confirmSwitch }}" style="border:none;border-radius:16px;padding:16px;font-size:17px;font-weight:700;background:{{ pickBg }};color:#fff;cursor:pointer">Start trial</button>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const AREAS={daily:{name:'Daily life',h:175},school:{name:'Academics',h:255},work:{name:'Work',h:70},chores:{name:'Chores',h:330}};
+const tint=h=>`oklch(0.94 0.035 ${h})`,mid=h=>`oklch(0.68 0.09 ${h})`,deep=h=>`oklch(0.42 0.08 ${h})`;
+const HELP=['oklch(0.68 0.12 25)','oklch(0.78 0.11 75)','oklch(0.68 0.11 150)'];
+const HELPLBL=['did not help','helped a little','helped'];
+const FEELS=[
+ {label:'Calm',icon:'self_improvement',h:150,title:'Good to hear',text:'Feeling calm is a good time to start something tricky.',tip:'Pick the next task while you feel steady.'},
+ {label:'Happy',icon:'sentiment_very_satisfied',h:95,title:'That is great',text:'Something is going well today.',tip:'Add a note about what made it good, so you can do it again.'},
+ {label:'Tired',icon:'battery_2_bar',h:255,title:'Thanks for noticing',text:'Being tired makes everything harder. That is normal.',tip:'Drink some water or take a 5 minute rest before the next task.'},
+ {label:'Worried',icon:'sentiment_worried',h:300,title:'Thanks for telling us',text:'Worries feel big. Naming them is a good first step.',tip:'Name one thing you can control right now.'},
+ {label:'Frustrated',icon:'sentiment_frustrated',h:40,title:'That is okay',text:'Frustration means something is hard. It does not mean you are failing.',tip:'Take a 3 minute movement break, then try one small step.'},
+ {label:'Overwhelmed',icon:'sentiment_stressed',h:25,title:'Thanks for telling us',text:'When it is too much, make the next step tiny.',tip:'Do just one small step, or ask someone for help.'}];
+const FEEL=Object.fromEntries(FEELS.map(x=>[x.label,x]));
+const FREQS=[['Every day',7],['5× a week',5],['3× a week',3],['Once a week',1]];
+const DAYN=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const REMS={Off:'',Morning:'8:00 am',Afternoon:'3:00 pm',Evening:'7:00 pm'};
+const freqText=f=>{if(!f)return 'Every day';if(f.days&&f.days.length){const d=[...f.days].sort();if(d.join()==='0,1,2,3,4')return 'Weekdays';if(d.length===7)return 'Every day';return d.map(i=>DAYN[i]).join(', ');}return f.n>=7?'Every day':f.n===1?'Once a week':f.n+'× a week';};
+const DONE_T=['Well done!','Nice work!','You did it!','Great job!'];
+const TASK_ICON={morning:'light_mode',reading:'menu_book',math:'calculate',cat:'pets',bed:'bedtime',meds:'medication',post:'campaign',persona:'groups',clothes:'checkroom',study:'school'};
+const AREA_ICON={daily:'home',school:'school',work:'work',chores:'cleaning_services'};
+const OBS=['welcome','invite','who','profile','needs','access','team','ready'];
+const STAT={Working:150,Mixed:75,'Not working':25};
+const DOW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const TODAY=new Date(2026,9,5);
+const dateAt=o=>new Date(2026,9,8+o);
+const EVENTS={'-5':[{time:'3:30',title:'Occupational therapy'}],'2':[{time:'3:30',title:'Occupational therapy'}],'4':[{time:'All day',title:'Spelling test'}],'7':[{time:'4:00',title:'Strategy review with Dr. Okafor'}],'9':[{time:'3:30',title:'Occupational therapy'}],'16':[{time:'3:30',title:'Occupational therapy'}],'23':[{time:'3:30',title:'Occupational therapy'}]};
+const ALTS=[
+ {name:'Token board',desc:'Earn a token per finished part; 5 tokens = chosen break.'},
+ {name:'Chunked worksheet',desc:'Only 3 problems visible at a time, rest folded away.'},
+ {name:'Body-doubling',desc:'Someone sits nearby doing their own quiet task.'},
+ {name:'Choice of two',desc:'Pick which of two tasks to do first.'}];
+const EVENTS_ADULT={'-3':[{time:'5:00',title:'Therapy session'}],'1':[{time:'10:00',title:'Team check-in'}],'4':[{time:'5:00',title:'Therapy session'}],'8':[{time:'All day',title:'Report due'}],'11':[{time:'5:00',title:'Therapy session'}],'18':[{time:'5:00',title:'Therapy session'}]};
+const PROFILES={
+ child:{name:'Maya',label:'Maya, 9',initial:'M',support:'Parent',supportPl:"Maya's parents",roles:['Maya','Parent','Therapist'],
+  help:['Maya sees one task at a time, follows the strategy steps, then rates how it went and whether the strategy helped. Try starting Math homework.','Parents see what was done today, how each strategy is trending, and can flag one for the therapist.']},
+ adult:{name:'Sam',label:'Sam, 28',initial:'S',support:'Support person',supportPl:"Sam's support person",roles:['Sam','Support','Therapist'],
+  help:['Sam works through the day one task at a time, follows the strategy steps, then rates whether the strategy helped. Try starting Post online.','A partner, coach or caregiver Sam chooses can see progress and flag a strategy for review. Sam controls who has access.']}};
+const INIT_ADULT=()=>[
+ {id:'meds',time:'',title:'Took medicine',area:'daily',done:true,feel:'Easy',helped:2,flagged:false,
+  strat:{name:'Alarm + pill organizer',desc:'Phone alarm labelled "meds", organizer next to the kettle.',steps:['Alarm goes off','Take meds from the organizer','Dismiss the alarm'],timer:0,hist:[2,2,2,1,2,2,null,2,2,2,2,2,2,2,1,2],len:21,started:'Sep 22',prev:'Remembering on my own'}},
+ {id:'post',time:'',title:'Posted online',area:'work',done:false,feel:null,helped:null,flagged:false,
+  strat:{name:'Batch on Mondays',desc:'Write all posts for the week in one Monday session.',steps:['Open the drafts doc','Write one post','Schedule it','Repeat for the week'],timer:0,hist:[1,0,0,null,0,1,0,0,null,0,0,1,0,null,0,0],len:21,started:'Sep 22',prev:'Posting when inspired',freq:{n:3,days:[]}}},
+ {id:'persona',time:'',title:'Made personas',area:'work',done:true,feel:'Okay',helped:1,flagged:false,
+  strat:{name:'Pomodoro (25/5)',desc:'25 minutes of focused work, then a 5 minute break away from the desk.',steps:['Close chat and email','Pick one persona','Start the timer','Break when it rings'],timer:25,hist:[1,2,1,1,null,2,1,2,1,1,2,1,1,null,2,1],len:21,started:'Sep 22',prev:'Working until done',freq:{n:5,days:[0,1,2,3,4]}}},
+ {id:'clothes',time:'',title:'Clothes ready before sleep',area:'daily',done:false,feel:null,helped:null,flagged:false,
+  strat:{name:'Chair by the bed',desc:'Tomorrow\'s outfit goes on the chair before brushing teeth.',steps:['Check tomorrow\'s weather','Pick the outfit','Put it on the chair'],timer:0,hist:[2,null,2,2,1,2,null,2,2,2],len:14,started:'Sep 28',prev:'Choosing in the morning',reminder:'Evening'}},
+ {id:'study',time:'',title:'Course reading',area:'school',done:false,feel:null,helped:null,flagged:false,
+  strat:{name:'Online body-doubling',desc:'Read on a video call with a study partner, cameras on.',steps:['Join the study call','Say your goal out loud','Read one chapter'],timer:0,hist:[2,1,null],len:14,started:'Oct 5',prev:'Reading alone'}}];
+const INIT_CHILD=()=>[
+ {id:'morning',time:'7:30',title:'Morning routine',area:'daily',done:true,feel:'Easy',helped:2,flagged:false,
+  strat:{name:'Picture checklist',desc:'Photos of each step taped to the bathroom door.',steps:['Look at the picture card','Brush teeth','Get dressed','Pack school bag'],timer:0,hist:[2,2,1,2,2,null,2,2,2,1,2,2,2],len:14,started:'Sep 22',prev:'Verbal reminders'}},
+ {id:'reading',time:'4:00',title:'Reading practice',area:'school',done:true,feel:'Okay',helped:1,flagged:false,
+  strat:{name:'Timer + break (10/3)',desc:'Read for 10 minutes, then a 3 minute movement break.',steps:['Pick your book','Start the timer','Read until it rings','Take your break'],timer:10,hist:[1,2,1,null,1,0,2,1,1,null,2,1,1],len:14,started:'Sep 22',prev:'20 min sit-down'}},
+ {id:'math',time:'4:30',title:'Math homework',area:'school',done:false,feel:null,helped:null,flagged:false,
+  strat:{name:'First–Then board',desc:'First finish the worksheet, then 15 minutes of drawing.',steps:['Look at your First–Then board','Do the worksheet','Show it to a grown-up','Then: drawing time'],timer:0,hist:[2,1,1,1,0,null,1,0,0,null,0,0,1],len:14,started:'Sep 22',prev:'Sticker chart'}},
+ {id:'cat',time:'6:00',title:'Feed the cat',area:'chores',done:false,feel:null,helped:null,flagged:false,
+  strat:{name:'Visual reminder card',desc:'A card on the fridge with the cat bowl picture.',steps:['Check the fridge card','Fill the bowl','Fresh water','Flip the card to done'],timer:0,hist:[2,2,2,null,2,1,2,2,2,2],len:14,started:'Sep 25',prev:'None'}},
+ {id:'bed',time:'8:00',title:'Bedtime routine',area:'daily',done:false,feel:null,helped:null,flagged:false,
+  strat:{name:'Wind-down countdown',desc:'Lights dim at 30, 15 and 5 minutes before bed.',steps:['30 min: screens off','15 min: bath and pyjamas','5 min: pick a book','Lights out'],timer:0,hist:[1,null,2],len:14,started:'Oct 2',prev:'Fixed bedtime only'}}];
+
+class Component extends DCLogic {
+  state={profile:'child',role:'child',screen:'welcome',names:{},set:{child:{pics:false,read:false},adult:{pics:false,read:false}},inviteCode:'',ob:{who:null,name:'',age:null,dx:[],needs:[],areas:['daily','school'],pics:false,read:false,motion:false,ther:'',sup:''},taskId:'math',steps:{},feel:null,help:null,toast:null,sel:0,timer:0,running:false,sheet:false,pick:null,noteText:'',tasksBy:{child:INIT_CHILD(),adult:INIT_ADULT()},wk:0,calMode:'week',addOpen:false,addSteps:[''],addFreq:7,addDays:[],addRem:'Off',doneId:null,doneN:0,quick:false,qFeel:null,qNote:'',qDone:false,addTitle:'',addArea:'daily',addStrat:'',
+    notesBy:{adult:[{who:'Sam',role:'child',when:'Oct 7',text:'Posting feels like a wall right now.',feel:'Overwhelmed'},{who:'Dr. Okafor',role:'therapist',when:'Oct 1',text:'Batching posts on Mondays is not sticking. Let us talk about alternatives at the next session.'}],child:[{who:'Maya',role:'child',when:'Oct 7',text:'Math was too long.',feel:'Frustrated'},{who:'Dr. Okafor',role:'therapist',when:'Oct 2',text:'Reading timer looks promising. Keep the 3-minute break consistent this week.'},{who:'Parent',role:'parent',when:'Oct 1',text:'Math is still a struggle. She ignores the First–Then board most days.'}]}};
+  T(){return this.state.tasksBy[this.state.profile];}
+  N(){return this.state.notesBy[this.state.profile];}
+  P(){const b=PROFILES[this.state.profile],n=this.state.names[this.state.profile];if(!n)return b;const r=x=>x.split(b.name).join(n);return {...b,name:n,label:n,initial:n[0].toUpperCase(),supportPl:r(b.supportPl),roles:[n,b.roles[1],b.roles[2]],help:b.help.map(r)};}
+  EV(){return {};}
+  componentWillUnmount(){clearInterval(this.iv);clearTimeout(this.tt);}
+  showToast(t){this.setState({toast:t});clearTimeout(this.tt);this.tt=setTimeout(()=>this.setState({toast:null}),2600);}
+  upd(id,fn){this.setState(s=>({tasksBy:{...s.tasksBy,[s.profile]:s.tasksBy[s.profile].map(t=>t.id===id?fn(t):t)}}));}
+  addNoteRaw(text,feel){const r=this.state.role;const who=r==='therapist'?'Dr. Okafor':r==='child'?this.P().name:this.P().support;this.setState(s=>({notesBy:{...s.notesBy,[s.profile]:[{who,role:r,when:'Today',text,feel},...s.notesBy[s.profile]]}}));}
+  stats(t){const s=t.strat,h=t.done&&t.helped!=null?[...s.hist,t.helped]:s.hist,d=h.filter(x=>x!=null),n=d.length,rate=n?d.reduce((a,b)=>a+b,0)/(2*n):0,day=s.hist.length+1;
+    const status=n<5?'Too early':rate>=.65?'Working':rate>=.6?'Mixed':rate>=.45?'Mixed':'Not working';
+    const hue=STAT[status];return {h,n,rate,day,len:s.len,status,review:(status==='Not working'&&day>=10)||t.flagged,chipBg:hue?tint(hue):'#ecebe6',chipFg:hue?deep(hue):'#55514a',hue};}
+  setProfile=p=>{clearInterval(this.iv);const first=PROFILES[p];this.setState({profile:p,taskId:p==='child'?'math':'post',screen:this.state.role==='child'?'today':'overview',sheet:false,running:false,sel:0});};
+  setRole=r=>{clearInterval(this.iv);this.setState({role:r,screen:r==='child'?'today':'overview',sheet:false,running:false});};
+  openTask=id=>{const t=this.T().find(x=>x.id===id);clearInterval(this.iv);this.setState({screen:'task',taskId:id,timer:t.strat.timer*60,running:false,feel:t.feel,help:t.helped});};
+  toggleTimer=()=>{if(this.state.running){clearInterval(this.iv);this.setState({running:false});return;}
+    this.setState({running:true});this.iv=setInterval(()=>{this.setState(s=>{if(s.timer<=1){clearInterval(this.iv);return {timer:0,running:false};}return {timer:s.timer-1};});},1000);};
+  saveCheckin=()=>{const {feel,help,taskId}=this.state;if(!feel||help==null)return;clearInterval(this.iv);
+    this.upd(taskId,t=>({...t,done:true,feel,helped:help}));this.setState(st=>({screen:'today',running:false,doneId:taskId,doneN:st.doneN+1}));};
+  keepGoing=()=>{const t=this.cur();this.upd(t.id,x=>({...x,strat:{...x.strat,len:x.strat.len+7}}));this.addNoteRaw(`Extended the ${t.strat.name} trial by 7 days.`);this.showToast('Trial extended by 7 days');};
+  confirmSwitch=()=>{const p=ALTS.find(a=>a.name===this.state.pick);if(!p)return;const t=this.cur();
+    this.upd(t.id,x=>({...x,flagged:false,done:false,feel:null,helped:null,strat:{name:p.name,desc:p.desc,steps:x.strat.steps,timer:0,hist:[],len:14,started:'Oct 5',prev:x.strat.name}}));
+    this.addNoteRaw(`Switched ${t.title.toLowerCase()} from ${t.strat.name} to ${p.name}. New 14-day trial.`);this.setState({sheet:false,pick:null});this.showToast(`${p.name} starts today`);};
+  toggleFlag=()=>{const t=this.cur();this.upd(t.id,x=>({...x,flagged:!x.flagged}));if(!t.flagged){this.addNoteRaw(`Flagged ${t.strat.name} for review.`);this.showToast('Dr. Okafor will see this');}};
+  addTask=()=>{const {addTitle,addStrat,addArea,role}=this.state;if(!addTitle.trim()||!addStrat.trim())return;
+    const {addSteps,addFreq,addDays,addRem}=this.state;const t={id:'n'+Date.now(),time:'',title:addTitle.trim(),area:addArea,done:false,feel:null,helped:null,flagged:false,
+      strat:{freq:{n:addDays.length||addFreq,days:addDays},reminder:addRem==='Off'?null:addRem,name:addStrat.trim(),desc:'Added '+(role==='child'?'by '+this.P().name:role==='therapist'?'by Dr. Okafor':'by '+this.P().support.toLowerCase())+'.',steps:addSteps.map(x=>x.trim()).filter(Boolean),timer:0,hist:[],len:14,started:'Oct 8',prev:'None'}};
+    this.setState(s=>({tasksBy:{...s.tasksBy,[s.profile]:[...s.tasksBy[s.profile],t]},addOpen:false,addTitle:'',addStrat:'',addSteps:[''],addFreq:7,addDays:[],addRem:'Off'}));
+    this.addNoteRaw('Added "'+t.title+'" with strategy "'+t.strat.name+'".');this.showToast('Task added for everyone');};
+  saveQuick=()=>{const {qFeel,qNote}=this.state;if(!qFeel)return;this.addNoteRaw(qNote.trim()||('Feeling '+qFeel.toLowerCase()+'.'),qFeel);this.setState({qDone:true,qNote:''});};
+  tick=id=>{const t=this.T().find(x=>x.id===id);if(t.done){this.upd(id,x=>({...x,done:false,feel:null,helped:null}));return;}
+    this.upd(id,x=>({...x,done:true}));this.setState(st=>({doneId:id,doneN:st.doneN+1}));};
+  setRem=(id,r)=>{this.upd(id,x=>({...x,strat:{...x.strat,reminder:r}}));this.setState({doneId:null});this.showToast(r+' reminder set for '+REMS[r]);};
+  speak(t){try{const u=new SpeechSynthesisUtterance(t);u.rate=.9;speechSynthesis.cancel();speechSynthesis.speak(u);}catch(e){}this.showToast('Reading aloud');}
+  obSet(p){this.setState(s=>({ob:{...s.ob,...p}}));}
+  obToggle(k,v){this.setState(s=>{const a=s.ob[k];return {ob:{...s.ob,[k]:a.includes(v)?a.filter(x=>x!==v):[...a,v]}};});}
+  obFinish=()=>{const o=this.state.ob;const prof=o.age==='18+'?'adult':'child';const role=o.who==='self'?'child':o.who==='child'?'parent':'therapist';
+    this.setState(s=>({profile:prof,role,names:{...s.names,[prof]:o.name.trim()||null},set:{...s.set,[prof]:{pics:o.pics,read:o.read}},screen:role==='child'?'today':'overview',taskId:prof==='child'?'math':'post'}));};
+  cur(){return this.T().find(t=>t.id===this.state.taskId);}
+  dayInfo(o){const tasks=this.T();if(o>0)return {pct:0,done:0,total:tasks.length,rows:tasks.map(t=>({t,state:'Planned'}))};
+    if(o===0){const done=tasks.filter(t=>t.done).length;return {pct:done/tasks.length,done,total:tasks.length,rows:tasks.map(t=>({t,state:t.done?'Done':'To do'}))};}
+    const k=-o,rows=[];tasks.forEach(t=>{const hl=t.strat.hist;if(k<=hl.length){const v=hl[hl.length-k];rows.push({t,state:v==null?'Missed':'Done',v});}});
+    const done=rows.filter(r=>r.state==='Done').length;return {pct:rows.length?done/rows.length:0,done,total:rows.length,rows};}
+  renderVals(){
+    const S=this.state,P=this.P(),role=S.role,adult=role!=='child',tasks=this.T(),cur=this.cur(),A=AREAS[cur.area];
+    const done=tasks.filter(t=>t.done).length,next=tasks.find(t=>!t.done);
+    const row=t=>{const a=AREAS[t.area];return {...t,stratName:t.strat.name,areaName:a.name,tint:tint(a.h),deep:deep(a.h),initial:t.title[0],icon:TASK_ICON[t.id]||AREA_ICON[t.area],speak:()=>this.speak(t.title+'. '+t.strat.name),open:()=>this.openTask(t.id),tick:()=>this.tick(t.id),
+      opacity:t.done?.65:1,check:t.done?'✓':'',checkBg:t.done?deep(a.h):'transparent',checkBorder:t.done?deep(a.h):'#d6d1c6'};};
+    const go=screen=>()=>{clearInterval(this.iv);this.setState({screen,running:false,sheet:false});};
+    const navDefs=adult?[['Overview','overview','dashboard'],['Tracker','calendar','calendar_month'],['Notes','notes','edit_note']]:[['Today','today','today'],['Tracker','calendar','calendar_month'],['My week','progress','bar_chart'],['Notes','notes','edit_note']];
+    const scr=S.screen,navActive=k=>k===scr||(k==='today'&&(scr==='task'||scr==='checkin'))||(k==='overview'&&scr==='strategy');
+    const st=this.stats(cur);
+    const ss=st.h;const bars=[];for(let i=0;i<st.len;i++){const v=i<ss.length?ss[i]:undefined;const isToday=i===st.day-1;
+      bars.push(v===undefined?{h:isToday?'100%':'100%',bg:'transparent',border:isToday?'1.5px dashed #9a948a':'1px solid #ece9e2'}:v===null?{h:'10%',bg:'#dcd8cf',border:'none'}:{h:['30%','62%','100%'][v],bg:HELP[v],border:'none'});}
+    const cells=[];for(let i=0;i<35;i++){const o=i-10,d=dateAt(o),info=this.dayInfo(o),sel=o===S.sel,isT=o===0,ev=this.EV()[o];
+      cells.push({num:d.getDate(),onClick:()=>this.setState({sel:o}),bg:sel?'#24221e':isT?'#fff':'transparent',fg:sel?'#fff':'#24221e',border:isT&&!sel?'1.5px solid #24221e':'1px solid transparent',
+        opacity:d.getMonth()===9?1:.4,pct:o>0?'0%':Math.round(info.pct*100)+'%',bar:info.pct>=.8?HELP[2]:info.pct>=.5?HELP[1]:HELP[0],evDot:ev?(sel?'#fff':'oklch(0.55 0.1 255)'):'transparent'});}
+    const sd=dateAt(S.sel),sinfo=this.dayInfo(S.sel);
+    const agenda=[...(this.EV()[S.sel]||[]).map(e=>({time:e.time,title:e.title,sub:'Appointment',color:'oklch(0.55 0.1 255)',state:'',stateColor:'#6b665d',bg:'oklch(0.97 0.015 255)'})),
+      ...sinfo.rows.map(r=>{const a=AREAS[r.t.area];return {time:r.t.time,title:r.t.title,sub:adult&&r.v!=null?`${r.t.strat.name} · ${HELPLBL[r.v]}`:r.t.strat.name,color:mid(a.h),state:r.state,
+        stateColor:r.state==='Done'?deep(150):r.state==='Missed'?deep(25):'#6b665d',bg:'#fff'};})];
+    const areaRows=Object.entries(AREAS).map(([k,a])=>{const ts=tasks.filter(t=>t.area===k);let cnt=0,tot=0;const days=[];
+      for(let j=6;j>=0;j--){let dn=0,tt=0;ts.forEach(t=>{if(j===0){tt++;if(t.done)dn++;}else if(j<=t.strat.hist.length){tt++;if(t.strat.hist[t.strat.hist.length-j]!=null)dn++;}});cnt+=dn;tot+=tt;
+        days.push({label:DOW[dateAt(-j).getDay()][0],bg:tt&&dn===tt?mid(a.h):dn?tint(a.h):'#fff',border:dn?'none':'1px solid #e4e0d7'});}
+      return {name:a.name,count:`${cnt} of ${tot} done`,days};});
+    const helping=tasks.filter(t=>this.stats(t).status==='Working').map(t=>({name:t.strat.name,task:t.title.toLowerCase()}));
+    const alerts=tasks.filter(t=>this.stats(t).review).map(t=>{const s=this.stats(t);return {open:()=>this.setState({screen:'strategy',taskId:t.id}),
+      kicker:t.flagged?'Flagged by '+P.support.toLowerCase():'Time to review',text:t.flagged?`${t.strat.name} for ${t.title.toLowerCase()} needs a look.`:`${t.strat.name} helped ${Math.round(s.rate*100)}% of the time over ${s.day-1} days. Consider switching.`};});
+    const stratRows=tasks.map(t=>{const s=this.stats(t),a=AREAS[t.area];const spark=[];for(let i=0;i<s.len;i++){const v=s.h[i];spark.push({bg:v===undefined?'#f0ede6':v===null?'#dcd8cf':HELP[v]});}
+      return {name:t.strat.name,task:t.title,area:a.name,status:s.status,chipBg:s.chipBg,chipFg:s.chipFg,day:s.day,len:s.len,rate:s.n?Math.round(s.rate*100)+'%':'–',spark,open:()=>this.setState({screen:'strategy',taskId:t.id})};});
+    const left=st.len-st.day;
+    const verdict=st.status==='Too early'?`Not enough check-ins yet (${st.n} of 5 needed).`:st.status==='Not working'&&st.day>=10?'Rule met: the evidence supports trying a different strategy.':st.status==='Working'?'On track: keep this strategy going.':st.status==='Mixed'?'Close to target. Keep going and recheck at the end of the trial.':'Below target, but keep collecting data until day 10.';
+    const vh=STAT[st.status];
+    const mon=-3+S.wk*7;
+    const weekDays=[];for(let j=0;j<7;j++){const o=mon+j,d=dateAt(o);weekDays.push({l:'MTWTFSS'[j],n:d.getDate(),fg:o===0?'#fff':'#6b665d',bg:o===0?'#24221e':'transparent'});}
+    let wDone=0,wPos=0;
+    const weekRows=tasks.map(t=>{const a=AREAS[t.area],hl=t.strat.hist;let dn=0,pos=0;const wc=[];
+      for(let j=0;j<7;j++){const o=mon+j;let v;
+        if(o>0)v='future';else if(o===0)v=t.done?(t.helped??'nr'):'today';
+        const fd=(t.strat.freq&&t.strat.freq.days)||[];if(v===null&&fd.length&&!fd.includes(j))v='none';else{const k=-o;v=k<=hl.length?hl[hl.length-k]:'none';}
+        let c;
+        if(v==='future')c={bg:'#f0ede6',border:'1px solid transparent',mark:''};
+        else if(v==='today'){pos++;c={bg:'#fff',border:'1.5px dashed #24221e',mark:''};}
+        else if(v==='none')c={bg:'transparent',border:'1px solid transparent',mark:'–',mfg:'#b9b4aa'};
+        else if(v===null){pos++;c={bg:'#fff',border:'1.5px solid #d6d1c6',mark:''};}
+        else if(v==='nr'){pos++;dn++;c={bg:deep(a.h),border:'1px solid transparent',mark:'✓'};}
+        else{pos++;dn++;c={bg:adult?HELP[v]:deep(a.h),border:'1px solid transparent',mark:'✓'};}
+        wc.push({mfg:'#fff',...c});}
+      wDone+=dn;wPos+=pos;
+      const fq=t.strat.freq,tgt=fq?(fq.days.length||fq.n):7;
+      return {title:t.title,strat:t.strat.name,freq:freqText(fq),count:dn+' of '+tgt,dot:mid(a.h),cells:wc};});
+    const ws=dateAt(mon),we=dateAt(mon+6);
+    const legend=adult?[{label:'Helped',bg:HELP[2],border:'none'},{label:'A little',bg:HELP[1],border:'none'},{label:'Did not help',bg:HELP[0],border:'none'},{label:'Missed',bg:'#fff',border:'1.5px solid #d6d1c6'},{label:'Today',bg:'#fff',border:'1.5px dashed #24221e'}]
+      :[{label:'Done',bg:deep(175),border:'none'},{label:'Missed',bg:'#fff',border:'1.5px solid #d6d1c6'},{label:'Today',bg:'#fff',border:'1.5px dashed #24221e'}];
+    const seg=(cur,k,l,fn)=>({label:l,onClick:fn,bg:cur===k?'#fff':'transparent',fg:cur===k?'#24221e':'#6b665d',shadow:cur===k?'0 1px 3px rgba(0,0,0,.1)':'none'});
+    return {
+      feelChips:FEELS.map(x=>({label:x.label,icon:x.icon,deep:deep(x.h),tint:tint(x.h),dot:mid(x.h),onClick:()=>this.setState({quick:true,qFeel:x.label,qDone:false})})),
+      quick:S.quick,qForm:!S.qDone,qDone:S.qDone,qNote:S.qNote,onQNote:e=>this.setState({qNote:e.target.value}),saveQuick:this.saveQuick,
+      openQuick:()=>this.setState({quick:true,qFeel:null,qDone:false}),closeQuick:()=>this.setState({quick:false,qDone:false}),qBg:S.qFeel?'#24221e':'#b9b4aa',
+      qOpts:FEELS.map(x=>({label:x.label,icon:x.icon,deep:deep(x.h),dot:mid(x.h),bg:S.qFeel===x.label?tint(x.h):'#fff',border:S.qFeel===x.label?deep(x.h):'#e4e0d7',onClick:()=>this.setState({qFeel:x.label})})),
+      fb:(()=>{const x=FEEL[S.qFeel]||FEELS[0];return {title:x.title,text:x.text,tip:x.tip,tint:tint(x.h),dot:mid(x.h),shared:role==='child'?'Saved to Notes. Your team can see it.':'Saved to Notes.'};})(),
+      hasFeelToday:this.N().some(n=>n.when==='Today'&&n.feel),feelToday:this.N().filter(n=>n.when==='Today'&&n.feel).map(n=>({label:n.feel,tint:tint(FEEL[n.feel].h),dot:mid(FEEL[n.feel].h)})),
+      addStepRows:S.addSteps.map((v,i)=>({num:i+1,value:v,ph:i===0?'e.g. Check the weather':'Next step',onChange:e=>{const val=e.target.value;this.setState(st=>{const a=[...st.addSteps];a[i]=val;return {addSteps:a};});},remove:()=>this.setState(st=>{const a=st.addSteps.filter((_,k)=>k!==i);return {addSteps:a.length?a:['']};})})),
+      addStepRow:()=>this.setState(st=>({addSteps:[...st.addSteps,'']})),
+      freqOpts:FREQS.map(([l,n])=>{const on=!S.addDays.length&&S.addFreq===n;return {label:l,onClick:()=>this.setState({addFreq:n,addDays:[]}),bg:on?'oklch(0.94 0.035 255)':'#fff',border:on?'oklch(0.42 0.08 255)':'#e4e0d7'};}),
+      dayOpts:['M','T','W','T','F','S','S'].map((l,i)=>{const on=S.addDays.includes(i);return {label:l,onClick:()=>this.setState(st=>({addDays:on?st.addDays.filter(x=>x!==i):[...st.addDays,i]})),bg:on?'oklch(0.42 0.08 255)':'#fff',fg:on?'#fff':'#24221e',border:on?'oklch(0.42 0.08 255)':'#e4e0d7'};}),
+      freqHint:S.addDays.length?freqText({days:S.addDays})+'. Tap a day again to remove it.':'No set days. Any day counts toward '+freqText({n:S.addFreq,days:[]}).toLowerCase()+'.',
+      remOpts:Object.keys(REMS).map(k=>({label:k==='Off'?'No reminder':k+' · '+REMS[k],onClick:()=>this.setState({addRem:k}),bg:S.addRem===k?'oklch(0.94 0.035 255)':'#fff',border:S.addRem===k?'oklch(0.42 0.08 255)':'#e4e0d7'})),
+      doneOpen:!!S.doneId,closeDone:()=>this.setState({doneId:null}),
+      dn:(()=>{const t=tasks.find(x=>x.id===S.doneId)||tasks[0],a=AREAS[t.area],left=tasks.filter(x=>!x.done).length,r=t.strat.reminder;
+        return {title:DONE_T[S.doneN%DONE_T.length],sub:left?left+(left===1?' task':' tasks')+' left today.':'Everything is done for today.',tint:tint(a.h),deep:deep(a.h),task:t.title.toLowerCase(),
+          ask:!r,has:!!r,remLine:r?'Reminder set for '+REMS[r]+'.':'',btn:r?'Done':'No thanks',
+          opts:['Morning','Afternoon','Evening'].map(k=>({label:k,time:REMS[k],onClick:()=>this.setRem(t.id,k)}))};})(),
+      ...(()=>{const o=S.ob,isOb=OBS.includes(scr),setp=['who','profile','needs','access','team'],si=setp.indexOf(scr);
+        const pick=(on)=>({bg:on?'oklch(0.94 0.035 255)':'#fff',border:on?'oklch(0.42 0.08 255)':'#e4e0d7',fg:on?'oklch(0.42 0.08 255)':'#55514a'});
+        const nm=o.name.trim()||(o.who==='self'?'you':o.who==='client'?'your client':'your child');
+        const okNext={who:!!o.who,profile:!!o.name.trim()&&!!o.age,needs:true,access:true,team:true}[scr];
+        const order=['who','profile','needs','access','team','ready'];
+        return {sWelcome:scr==='welcome',sInvite:scr==='invite',sWho:scr==='who',sProfile:scr==='profile',sNeeds:scr==='needs',sAccess:scr==='access',sTeam:scr==='team',sReady:scr==='ready',showNav:!isOb,
+          obHome:()=>{clearInterval(this.iv);this.setState({screen:'welcome',sheet:false,addOpen:false,quick:false,doneId:null});},obStart:()=>this.setState({screen:'who'}),obInvite:()=>this.setState({screen:'invite',inviteCode:''}),
+          inviteCode:S.inviteCode,onInvite:e=>this.setState({inviteCode:e.target.value.replace(/\D/g,'').slice(0,6)}),joinBg:S.inviteCode.length===6?'#24221e':'#b9b4aa',
+          obJoin:()=>{if(S.inviteCode.length<6)return;this.setState({profile:'child',role:'parent',screen:'overview'});this.showToast("Joined Maya's team");},
+          obSteps:setp.map((_,i)=>({bg:i<=si?'#24221e':'#e4e0d7'})),
+          obBack:()=>this.setState({screen:si<=0?'welcome':setp[si-1]}),obNext:()=>{if(okNext)this.setState({screen:order[order.indexOf(scr)+1]});},obNextBg:okNext?'#24221e':'#b9b4aa',
+          whoOpts:[['self','For myself','person','Adults managing their own strategies',175],['child','For my child','family_restroom','You will be the parent on the team',255],['client','For a client',"medical_services",'You will be the therapist on the team',70]].map(([k,l,ico,sub,h])=>({label:l,icon:ico,sub,tint:tint(h),deep:deep(h),...pick(o.who===k),onClick:()=>this.obSet({who:k,age:k==='self'?'18+':o.age})})),
+          obProfTitle:o.who==='self'?'About you':o.who==='client'?'About your client':'About your child',
+          obName:o.name,onObName:e=>this.obSet({name:e.target.value}),
+          ageOpts:['Under 8','8–12','13–17','18+'].map(a=>({label:a,...pick(o.age===a),onClick:()=>this.obSet({age:a})})),
+          dxOpts:['ADHD','Autism','Dyslexia','Anxiety','Dyspraxia','Other','Prefer not to say'].map(d=>({label:d,...pick(o.dx.includes(d)),onClick:()=>this.obToggle('dx',d)})),
+          needOpts:[['Starting tasks','play_circle'],['Remembering','psychology_alt'],['Changes in routine','swap_horiz'],['Staying focused','center_focus_strong'],['Noise and senses','hearing'],['Big feelings','favorite'],['Sleep','bedtime'],['Getting organised','inventory_2']].map(([l,ico])=>({label:l,icon:ico,...pick(o.needs.includes(l)),onClick:()=>this.obToggle('needs',l)})),
+          obAreaOpts:Object.entries(AREAS).map(([k,a])=>({label:a.name,icon:AREA_ICON[k],...pick(o.areas.includes(k)),onClick:()=>this.obToggle('areas',k)})),
+          obNameOr:nm,
+          accOpts:[['pics','Picture mode','image','Big icons and fewer words, for people who do not read yet'],['read','Read aloud','volume_up','A speaker button reads tasks and steps out loud'],['motion','Reduce motion','motion_photos_off','No moving or flashing effects']].map(([k,l,ico,sub])=>({label:l,icon:ico,sub,track:o[k]?'oklch(0.42 0.08 255)':'#cfcac0',justify:o[k]?'flex-end':'flex-start',onClick:()=>this.obSet({[k]:!o[k]})})),
+          obTher:o.ther,onObTher:e=>this.obSet({ther:e.target.value}),obSup:o.sup,onObSup:e=>this.obSet({sup:e.target.value}),
+          obSupLabel:o.who==='self'?"Support person's email (optional)":o.who==='client'?"Parent or carer's email":"Other parent or carer's email (optional)",
+          obSummary:[{k:'Profile for',v:(o.name.trim()||'–')+(o.age?' · '+o.age:'')},{k:'Tracking',v:o.areas.map(a=>AREAS[a].name).join(', ')||'–'},{k:'Picture mode',v:o.pics?'On':'Off'},{k:'Read aloud',v:o.read?'On':'Off'},{k:'Invited',v:[o.ther,o.sup].filter(x=>x.trim()).length+' people'}],
+          obFinish:this.obFinish};})(),
+      words:!S.set[S.profile].pics,readAloud:S.set[S.profile].read||S.set[S.profile].pics,picsLabel:S.set[S.profile].pics?'On':'Off',
+      togglePics:()=>this.setState(st=>({set:{...st.set,[st.profile]:{...st.set[st.profile],pics:!st.set[st.profile].pics}}})),
+      speakSteps:()=>this.speak(cur.title+'. '+cur.strat.steps.map((x,i)=>'Step '+(i+1)+'. '+x).join('. ')),
+      welcomeRows:[['checklist','Track everyday tasks',175],['insights','See which strategies help',150],['groups','Share progress with your team',255]].map(([icon,label,h])=>({icon,label,tint:tint(h),deep:deep(h)})),
+      calModes:[seg(S.calMode,'week','Week',()=>this.setState({calMode:'week'})),seg(S.calMode,'month','Month',()=>this.setState({calMode:'month'}))],
+      calWeek:S.calMode==='week',calMonth:S.calMode==='month',weekDays,weekRows,legend,
+      weekLabel:S.wk===0?'This week':S.wk===-1?'Last week':(-S.wk)+' weeks ago',
+      weekRange:MON[ws.getMonth()]+' '+ws.getDate()+' – '+MON[we.getMonth()]+' '+we.getDate(),weekTotal:wDone+' of '+wPos+' done',
+      prevWeek:()=>this.setState(s=>({wk:Math.max(-3,s.wk-1)})),nextWeek:()=>this.setState(s=>({wk:Math.min(0,s.wk+1)})),nextOp:S.wk<0?1:.35,
+      openAdd:()=>this.setState({addOpen:true}),closeAdd:()=>this.setState({addOpen:false}),addOpen:S.addOpen,addTask:this.addTask,
+      addTitle:S.addTitle,addStrat:S.addStrat,onAddTitle:e=>this.setState({addTitle:e.target.value}),onAddStrat:e=>this.setState({addStrat:e.target.value}),
+      addAreas:Object.entries(AREAS).map(([k,a])=>({name:a.name,label:a.name,onClick:()=>this.setState({addArea:k}),bg:S.addArea===k?tint(a.h):'#fff',border:S.addArea===k?deep(a.h):'#e4e0d7'})),
+      addBg:S.addTitle.trim()&&S.addStrat.trim()?'#24221e':'#b9b4aa',
+      addSub:'Everyone on '+(P.name)+"'s team can add tasks. It shows up for "+P.name+', support and Dr. Okafor.',
+      roles:[[P.roles[0],'child'],[P.roles[1],'parent'],[P.roles[2],'therapist']].map(([l,k])=>({label:l,onClick:()=>this.setRole(k),bg:k===role?'#fff':'transparent',fg:k===role?'#24221e':'#6b665d',shadow:k===role?'0 1px 3px rgba(0,0,0,.1)':'none'})),
+      roleHelp:OBS.includes(scr)?'Opening screens. A parent or therapist sets up a child\'s profile; adults can set up their own. Team members join with an invite code.':role==='child'?P.help[0]:role==='parent'?P.help[1]:'The therapist sees the same evidence plus a switch rule, and can extend a trial or swap in a new strategy.',
+      sToday:scr==='today',sTask:scr==='task',sCheckin:scr==='checkin',sProgress:scr==='progress',sCalendar:scr==='calendar',sOverview:scr==='overview',sStrategy:scr==='strategy',sNotes:scr==='notes',
+      doneLabel:`${done} of ${tasks.length} done`,segs:tasks.map(t=>({bg:t.done?deep(AREAS[t.area].h):'#e4e0d7'})),
+      hasNext:!!next,allDone:!next,next:next?row(next):{},taskRows:tasks.map(row),
+      cur:{...row(cur),freqText:freqText(cur.strat.freq),remText:cur.strat.reminder?'Reminder '+REMS[cur.strat.reminder]:'No reminder',hasSteps:cur.strat.steps.length>0,desc:cur.strat.desc,hasTimer:cur.strat.timer>0,started:cur.strat.started,prev:cur.strat.prev},
+      goToday:go('today'),goOverview:go('overview'),goCheckin:()=>{clearInterval(this.iv);this.setState({screen:'checkin',running:false});},backToTask:()=>this.setState({screen:'task'}),
+      timerText:`${Math.floor(S.timer/60)}:${String(S.timer%60).padStart(2,'0')}`,timerBtn:S.running?'Pause':S.timer===0?'Done':'Start',toggleTimer:this.toggleTimer,
+      stepRows:cur.strat.steps.map((txt,i)=>{const c=!!(S.steps[cur.id]||[])[i];return {text:txt,mark:c?'✓':'',bg:c?deep(A.h):'#fff',border:c?deep(A.h):'#d6d1c6',deco:c?'line-through':'none',color:c?'#6b665d':'#24221e',
+        onClick:()=>this.setState(s=>{const arr=[...(s.steps[cur.id]||[])];arr[i]=!arr[i];return {steps:{...s.steps,[cur.id]:arr}};})};}),
+      feelOpts:[['Easy',150,'sentiment_satisfied'],['Okay',75,'sentiment_neutral'],['Hard',25,'sentiment_dissatisfied']].map(([l,h,ico])=>({label:l,icon:ico,tint:tint(h),deep:deep(h),dot:mid(h),bg:S.feel===l?tint(h):'#fff',border:S.feel===l?deep(h):'#e4e0d7',onClick:()=>this.setState({feel:l})})),
+      helpOpts:[['Yes, it helped',2,'thumb_up'],['A little',1,'thumbs_up_down'],['No',0,'thumb_down']].map(([l,v,ico])=>({label:l,icon:ico,deep:deep([25,75,150][v]),dot:HELP[v],bg:S.help===v?tint([25,75,150][v]):'#fff',border:S.help===v?deep([25,75,150][v]):'#e4e0d7',onClick:()=>this.setState({help:v})})),
+      saveCheckin:this.saveCheckin,saveBg:S.feel&&S.help!=null?'#24221e':'#b9b4aa',
+      areaRows,helping,
+      dows:['M','T','W','T','F','S','S'],cells,selLabel:`${DOW[sd.getDay()]}, ${MON[sd.getMonth()]} ${sd.getDate()}`,selSummary:S.sel>0?'Planned':`${sinfo.done} of ${sinfo.total} done`,agenda,
+      roleSub:role==='therapist'?'Therapist view · Dr. Okafor':P.support+' view',alerts,logRows:tasks.map(t=>({title:t.title,time:t.time,dot:t.done?(t.helped!=null?HELP[t.helped]:'#24221e'):'#dcd8cf',result:!t.done?'Not logged yet':t.helped==null?'Ticked done · not rated':`Felt ${t.feel.toLowerCase()} · strategy ${HELPLBL[t.helped]}`,_x:'Not logged yet'})),stratRows,
+      st:{...st,trialPct:Math.min(100,st.day/st.len*100)+'%',left:left>0?`${left} days left`:'Last day',verdict,ruleBg:vh?tint(vh):'#ecebe6'},
+      bars,statTiles:[{value:`${st.n}/${st.h.length}`,label:'Days done',color:'#24221e'},{value:st.n?Math.round(st.rate*100)+'%':'–',label:'Helped',color:vh?deep(vh):'#24221e'},{value:'60%',label:'Target',color:'#24221e'}],
+      isTherapist:role==='therapist',isParent:role==='parent',keepGoing:this.keepGoing,toggleFlag:this.toggleFlag,flagLabel:cur.flagged?'Flagged for Dr. Okafor · Undo':'Flag for therapist review',
+      openSheet:()=>this.setState({sheet:true,pick:null}),closeSheet:()=>this.setState({sheet:false}),sheet:S.sheet,
+      alts:ALTS.filter(a=>a.name!==cur.strat.name).map(a=>({...a,border:S.pick===a.name?'#24221e':'#e4e0d7',onClick:()=>this.setState({pick:a.name})})),confirmSwitch:this.confirmSwitch,pickBg:S.pick?'#24221e':'#b9b4aa',
+      noteText:S.noteText,onNote:e=>this.setState({noteText:e.target.value}),addNote:()=>{if(!S.noteText.trim())return;this.addNoteRaw(S.noteText.trim());this.setState({noteText:''});},
+      p:{...P,hi:'Hi '+P.name,notesSub:'Shared between '+P.supportPl+' and Dr. Okafor',rating:'Did it help? ('+P.name+"'s rating)"},
+      profiles:[['Child','child'],['Adult','adult']].map(([l,k])=>({label:l,onClick:()=>this.setProfile(k),bg:k===S.profile?'#fff':'transparent',fg:k===S.profile?'#24221e':'#6b665d',shadow:k===S.profile?'0 1px 3px rgba(0,0,0,.1)':'none'})),
+      noteRows:this.N().map(n=>({...n,hasFeel:!!n.feel,feelLower:n.feel?n.feel.toLowerCase():'',feelTint:n.feel?tint(FEEL[n.feel].h):'',feelDot:n.feel?mid(FEEL[n.feel].h):'',color:n.role==='therapist'?deep(255):deep(175)})),
+      nav:navDefs.map(([l,k,ico])=>({label:l,icon:ico,onClick:go(k),pill:navActive(k)?'#e4e0d7':'transparent',fg:navActive(k)?'#24221e':'#8a857b'})),
+      toast:S.toast
+    };
+  }
+}
+</script>
+</body>
+</html>

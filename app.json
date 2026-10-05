@@ -1,0 +1,50 @@
+{
+  "expo": {
+    "name": "Stepwise",
+    "slug": "stepwise",
+    "scheme": "stepwise",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "backgroundColor": "#FAF9F6",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.understandinget.stepwise"
+    },
+    "android": {
+      "package": "com.understandinget.stepwise",
+      "adaptiveIcon": {
+        "backgroundColor": "#FFFFFF",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "name": "Stepwise · Understanding ET",
+      "themeColor": "#6E5893",
+      "backgroundColor": "#FAF9F6"
+    },
+    "plugins": [
+      "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#FAF9F6"
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#6E5893"
+        }
+      ]
+    ]
+  }
+}
