@@ -3,10 +3,6 @@ import { Platform, Pressable, RefreshControl, ScrollView, View } from 'react-nat
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Quicksand_700Bold } from '@expo-google-fonts/quicksand/700Bold';
-import { AtkinsonHyperlegible_400Regular } from '@expo-google-fonts/atkinson-hyperlegible/400Regular';
-import { AtkinsonHyperlegible_700Bold } from '@expo-google-fonts/atkinson-hyperlegible/700Bold';
-import { MaterialSymbolsRounded_500Medium } from '@expo-google-fonts/material-symbols-rounded/500Medium';
 import { createBackend } from './src/data';
 import { AppProvider, useApp, type RouteName } from './src/state/app';
 import { colors } from './src/theme';
@@ -122,13 +118,15 @@ function Shell() {
 
 export default function App() {
   const backend = useMemo(createBackend, []);
-  const [fontsLoaded] = useFonts({
-    Quicksand_700Bold,
-    AtkinsonHyperlegible_400Regular,
-    AtkinsonHyperlegible_700Bold,
-    MaterialSymbolsRounded_500Medium,
+  // Fonts live in assets/fonts (not node_modules) so web hosts like Netlify don't skip them.
+  const [fontsLoaded, fontError] = useFonts({
+    Quicksand_700Bold: require('./assets/fonts/Quicksand_700Bold.ttf'),
+    AtkinsonHyperlegible_400Regular: require('./assets/fonts/AtkinsonHyperlegible_400Regular.ttf'),
+    AtkinsonHyperlegible_700Bold: require('./assets/fonts/AtkinsonHyperlegible_700Bold.ttf'),
+    MaterialSymbolsRounded_500Medium: require('./assets/fonts/MaterialSymbolsRounded_500Medium.ttf'),
   });
-  if (!fontsLoaded) return <View style={{ flex: 1, backgroundColor: colors.bg }} />;
+  // If a font can't load, show the app anyway (with system fonts) rather than a blank screen.
+  if (!fontsLoaded && !fontError) return <View style={{ flex: 1, backgroundColor: colors.bg }} />;
   return (
     <SafeAreaProvider>
       <StatusBar style="dark" />

@@ -5,7 +5,7 @@ React Native can't use the font's ligatures everywhere, so icons are drawn by ch
 """
 from fontTools.ttLib import TTFont
 
-FONT = 'node_modules/@expo-google-fonts/material-symbols-rounded/500Medium/MaterialSymbolsRounded_500Medium.ttf'
+FONT = 'assets/fonts/MaterialSymbolsRounded_500Medium.ttf'
 cmap = TTFont(FONT).getBestCmap()
 names = {}
 for cp, glyph in sorted(cmap.items()):
