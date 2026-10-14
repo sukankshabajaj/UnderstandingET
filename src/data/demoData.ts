@@ -93,6 +93,7 @@ export function seedDemo(opts: DemoSeedOptions = {}, now = new Date()): DemoDB {
     read_aloud: opts.readAloud ?? false,
     reduce_motion: opts.reduceMotion ?? false,
     private_notifications: true,
+    share_by_default: false,
   };
   const members: Member[] = [
     { id: 'demo-m-self', person_id: personId, user_id: DEMO_USERS.self.id, role: 'self', relation_label: null, display_name: name },
@@ -135,8 +136,8 @@ export function seedDemo(opts: DemoSeedOptions = {}, now = new Date()): DemoDB {
     return d.toISOString();
   };
   const notes: Note[] = [
-    { id: 'demo-n1', person_id: personId, author_id: DEMO_USERS.self.id, author_name: name, author_role: 'self', text: 'Posting feels like a wall right now.', feeling: 'Overwhelmed', kind: 'note', created_at: ago(1) },
-    { id: 'demo-n2', person_id: personId, author_id: DEMO_USERS.therapist.id, author_name: DEMO_USERS.therapist.name, author_role: 'therapist', text: 'Batching posts on Mondays is not sticking. Let us talk about alternatives at the next session.', feeling: null, kind: 'note', created_at: ago(4, 11) },
+    { id: 'demo-n1', person_id: personId, author_id: DEMO_USERS.self.id, author_name: name, author_role: 'self', text: 'Posting feels like a wall right now.', feeling: 'Overwhelmed', kind: 'note', private: false, created_at: ago(1) },
+    { id: 'demo-n2', person_id: personId, author_id: DEMO_USERS.therapist.id, author_name: DEMO_USERS.therapist.name, author_role: 'therapist', text: 'Batching posts on Mondays is not sticking. Let us talk about alternatives at the next session.', feeling: null, kind: 'note', private: false, created_at: ago(4, 11) },
   ];
   const userRole = opts.userRole ?? 'self';
   return { version: 1, people: [person], members, tasks, strategies, logs, notes, flags: [], settings: { ...DEFAULT_SETTINGS }, userId: DEMO_USERS[userRole].id };

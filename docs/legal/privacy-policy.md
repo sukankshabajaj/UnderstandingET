@@ -8,6 +8,7 @@ This policy explains what information Stepwise keeps about you, why, who can see
 
 - We only collect what Stepwise needs to work.
 - Only the people on your team can see your information: you, the support people you invite, and your Understanding ET therapist.
+- Your feelings and notes are private unless you choose to share them.
 - Your information is stored securely by our database provider, Supabase, on servers in Mumbai, India.
 - We never sell your information, show you adverts, or use tracking tools.
 - You can download your information, or delete it, at any time in Settings.
@@ -48,7 +49,8 @@ We use your information because you have given your consent. For health informat
 
 ## Who can see it
 
-- Your team: everyone on a profile's team can see its tasks, check-ins, feelings and notes, and the names of the other team members.
+- Your team: everyone on a profile's team can see its tasks and check-ins, the notes they share, and the names of the other team members.
+- Your private log: feelings and notes are private by default. Only you can see them unless you choose to share them, one at a time or by changing the setting in Settings.
 - Understanding ET staff, only when needed to support you or to fix a problem.
 - Our service providers, who store and process information only on our instructions: Supabase (database and sign-in; data stored in Mumbai, India), the company that sends sign-in emails, and the company that hosts the web version of Stepwise.
 - Authorities, only if the law requires us to share it.

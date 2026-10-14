@@ -183,6 +183,10 @@ export class SupabaseBackend implements Backend {
     ok(await this.sb.rpc('add_task', { p_person: personId, p_title: input.title, p_area: input.area, p_icon: input.icon, p_strategy: input.strategy }));
   }
 
+  async editTask(taskId: string, input: NewTaskInput) {
+    ok(await this.sb.rpc('edit_task', { p_task: taskId, p_title: input.title, p_area: input.area, p_icon: input.icon, p_strategy: input.strategy }));
+  }
+
   async archiveTask(taskId: string) {
     ok(await this.sb.rpc('archive_task', { p_task: taskId }));
   }
@@ -203,13 +207,17 @@ export class SupabaseBackend implements Backend {
     ok(await this.sb.rpc('set_reminder', { p_strategy: strategyId, p_reminder: reminder ?? '' }));
   }
 
-  async logFeeling(personId: string, feeling: Feeling, note: string) {
-    ok(await this.sb.rpc('log_feeling', { p_person: personId, p_feeling: feeling, p_note: note }));
+  async logFeeling(personId: string, feeling: Feeling, note: string, isPrivate: boolean) {
+    ok(await this.sb.rpc('log_feeling', { p_person: personId, p_feeling: feeling, p_note: note, p_private: isPrivate }));
   }
 
-  async addNote(personId: string, text: string) {
+  async addNote(personId: string, text: string, isPrivate: boolean) {
     const uid = await this.uid();
-    ok(await this.sb.from('notes').insert({ person_id: personId, author_id: uid, text: text.trim(), kind: 'note' }));
+    ok(await this.sb.from('notes').insert({ person_id: personId, author_id: uid, text: text.trim(), kind: 'note', private: isPrivate }));
+  }
+
+  async setNotePrivate(noteId: string, isPrivate: boolean) {
+    ok(await this.sb.rpc('set_note_private', { p_note: noteId, p_private: isPrivate }));
   }
 
   async updatePerson(personId: string, patch: PersonSettingsPatch) {

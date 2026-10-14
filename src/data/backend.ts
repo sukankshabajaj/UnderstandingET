@@ -24,7 +24,7 @@ export interface NewTaskInput {
   strategy: NewStrategy;
 }
 
-export type PersonSettingsPatch = Partial<Pick<Person, 'picture_mode' | 'read_aloud' | 'reduce_motion' | 'private_notifications'>>;
+export type PersonSettingsPatch = Partial<Pick<Person, 'picture_mode' | 'read_aloud' | 'reduce_motion' | 'private_notifications' | 'share_by_default'>>;
 
 export interface Backend {
   readonly mode: 'demo' | 'live';
@@ -52,13 +52,17 @@ export interface Backend {
   saveLog(input: { personId: string; strategyId: string; taskId: string; date: string; feel: Feel | null; helped: Helped | null }): Promise<void>;
   deleteLog(strategyId: string, date: string): Promise<void>;
   addTask(personId: string, input: NewTaskInput): Promise<void>;
+  /** Changes a task and its current strategy without restarting the trial. */
+  editTask(taskId: string, input: NewTaskInput): Promise<void>;
   archiveTask(taskId: string): Promise<void>;
   switchStrategy(strategyId: string, next: { name: string; description: string }): Promise<void>;
   extendTrial(strategyId: string): Promise<void>;
   setFlag(strategyId: string, flagged: boolean): Promise<void>;
   setReminder(strategyId: string, reminder: Reminder | null): Promise<void>;
-  logFeeling(personId: string, feeling: Feeling, note: string): Promise<void>;
-  addNote(personId: string, text: string): Promise<void>;
+  logFeeling(personId: string, feeling: Feeling, note: string, isPrivate: boolean): Promise<void>;
+  addNote(personId: string, text: string, isPrivate: boolean): Promise<void>;
+  /** Share a private entry with the team, or make it private again (author only). */
+  setNotePrivate(noteId: string, isPrivate: boolean): Promise<void>;
   updatePerson(personId: string, patch: PersonSettingsPatch): Promise<void>;
   removeMember(membershipId: string): Promise<void>;
   deletePerson(personId: string): Promise<void>;

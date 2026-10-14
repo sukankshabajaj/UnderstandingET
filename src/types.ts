@@ -20,6 +20,8 @@ export interface Person {
   read_aloud: boolean;
   reduce_motion: boolean;
   private_notifications: boolean;
+  /** Whether new feelings and notes are shared with the team by default (off = private log). */
+  share_by_default: boolean;
 }
 
 export interface Member {
@@ -79,6 +81,8 @@ export interface Note {
   text: string;
   feeling: Feeling | null;
   kind: 'note' | 'system';
+  /** Only visible to its author (the person's personal log). */
+  private: boolean;
   created_at: string;
 }
 

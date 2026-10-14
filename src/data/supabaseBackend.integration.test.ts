@@ -92,11 +92,12 @@ run('SupabaseBackend (live)', () => {
     expect(snap.members.map((m) => m.display_name).sort()).toEqual(['Alex', 'Sam']);
     const sid = snap.strategies[0].id;
     await alex.setFlag(sid, true);
-    await alex.addNote(personId, 'Mornings are rushed this week.');
-    await alex.logFeeling(personId, 'Worried', '');
+    await alex.addNote(personId, 'Mornings are rushed this week.', false);
+    await alex.logFeeling(personId, 'Worried', '', false);
     await expect(alex.createInvite(personId, 'support')).rejects.toThrow(/cannot invite/);
     await expect(alex.switchStrategy(sid, { name: 'X', description: '' })).rejects.toThrow(/therapist/);
     await expect(alex.updatePerson(personId, { picture_mode: true })).rejects.toThrow(/Only the person/);
+    await expect(alex.editTask(snap.tasks[0].id, { title: 'x', area: 'daily', icon: 'home', strategy: { name: 'y', description: '', steps: [], timer_minutes: 0, freq_per_week: 7, freq_days: [], reminder: null } })).rejects.toThrow(/Only the person or their therapist/);
     const after = await alex.load(personId);
     expect(after.flags).toHaveLength(1);
     expect(after.notes.find((n) => n.text === 'Mornings are rushed this week.')?.author_name).toBe('Alex');
@@ -119,6 +120,39 @@ run('SupabaseBackend (live)', () => {
     expect(current.name).toBe('Token board');
     expect(current.replaced_strategy_id).toBe(sid);
     expect(snap.notes[0].text).toMatch(/Switched took medicine from Alarm \+ pill organizer to Token board/);
+  });
+
+  it('keeps private feelings and notes private until the person shares them', async () => {
+    await sam.logFeeling(personId, 'Overwhelmed', 'Rough morning', true);
+    await sam.addNote(personId, 'Just for me', true);
+    const own = await sam.load(personId);
+    expect(own.notes.filter((n) => n.private).map((n) => n.text).sort()).toEqual(['Just for me', 'Rough morning']);
+    let team = await okafor.load(personId);
+    expect(team.notes.some((n) => n.text === 'Rough morning' || n.text === 'Just for me')).toBe(false);
+    await expect(okafor.setNotePrivate(own.notes.find((n) => n.text === 'Just for me')!.id, false)).rejects.toThrow(/own entries/);
+    await sam.setNotePrivate(own.notes.find((n) => n.text === 'Rough morning')!.id, false);
+    team = await okafor.load(personId);
+    expect(team.notes.find((n) => n.text === 'Rough morning')?.feeling).toBe('Overwhelmed');
+    await sam.updatePerson(personId, { share_by_default: true });
+    expect((await sam.load(personId)).person.share_by_default).toBe(true);
+  });
+
+  it('lets the therapist and the person edit a task without restarting the trial', async () => {
+    let snap = await okafor.load(personId);
+    const task = snap.tasks[0];
+    const before = snap.strategies.find((s) => !s.ended_on)!;
+    await okafor.editTask(task.id, {
+      title: 'Medicines (morning)', area: 'daily', icon: 'pill',
+      strategy: { name: 'Token board v2', description: 'Fixed typo', steps: ['One', 'Two'], timer_minutes: 0, freq_per_week: 5, freq_days: [0, 1, 2, 3, 4], reminder: '07:30' },
+    });
+    snap = await sam.load(personId);
+    const after = snap.strategies.find((s) => !s.ended_on)!;
+    expect(after.id).toBe(before.id);
+    expect(after.name).toBe('Token board v2');
+    expect(after.freq_days).toEqual([0, 1, 2, 3, 4]);
+    expect(snap.tasks[0].title).toBe('Medicines (morning)');
+    expect(snap.tasks[0].icon).toBe('pill');
+    expect(snap.notes[0].text).toBe('Edited "Medicines (morning)".');
   });
 
   it('lets the therapist set up a second client profile', async () => {

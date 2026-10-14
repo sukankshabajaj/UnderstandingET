@@ -43,6 +43,7 @@ export interface Route {
 
 export type SheetState =
   | { kind: 'add' }
+  | { kind: 'edit'; taskId: string }
   | { kind: 'feeling'; feeling: Feeling | null }
   | { kind: 'done'; taskId: string }
   | { kind: 'switch'; strategyId: string };
@@ -263,12 +264,15 @@ function useAppValue(backend: Backend) {
       },
       setReminder: (strategyId: string, reminder: Reminder | null, success?: string) => run(() => backend.setReminder(strategyId, reminder), success),
       addTask: (input: NewTaskInput) => run(() => backend.addTask(personId, input), 'Task added for everyone'),
-      archiveTask: (taskId: string) => run(() => backend.archiveTask(taskId), 'Task removed from the plan'),
+      archiveTask: (taskId: string) => run(() => backend.archiveTask(taskId), 'Task deleted'),
       switchStrategy: (strategyId: string, next: { name: string; description: string }) => run(() => backend.switchStrategy(strategyId, next), `${next.name} starts today`),
       extendTrial: (strategyId: string, days: number) => run(() => backend.extendTrial(strategyId), `Trial extended by ${days} days`),
       setFlag: (strategyId: string, on: boolean, success?: string) => run(() => backend.setFlag(strategyId, on), success),
-      logFeeling: (feeling: Feeling, note: string) => run(() => backend.logFeeling(personId, feeling, note)),
-      addNote: (text: string) => run(() => backend.addNote(personId, text)),
+      logFeeling: (feeling: Feeling, note: string, isPrivate: boolean) => run(() => backend.logFeeling(personId, feeling, note, isPrivate)),
+      addNote: (text: string, isPrivate: boolean) => run(() => backend.addNote(personId, text, isPrivate)),
+      setNotePrivate: (noteId: string, isPrivate: boolean) =>
+        run(() => backend.setNotePrivate(noteId, isPrivate), isPrivate ? 'Now only you can see this' : 'Shared with your team'),
+      editTask: (taskId: string, input: NewTaskInput) => run(() => backend.editTask(taskId, input), 'Task updated'),
       updatePerson: (patch: PersonSettingsPatch) => run(() => backend.updatePerson(personId, patch)),
       removeMember: (membershipId: string, success: string) => run(() => backend.removeMember(membershipId), success),
       createInvite: async (role: Role) => {

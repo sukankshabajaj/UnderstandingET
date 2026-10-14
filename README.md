@@ -50,7 +50,6 @@ design/                  the original Claude Design prototype and handoff notes
 - Push notifications to the team (review alerts, flags, "worried/overwhelmed" feelings). Needs a Supabase Edge Function and push tokens.
 - Sending invite emails automatically (codes are shared with the Share button for now).
 - A screen for the client to see the therapist view log (the data is already recorded).
-- Editing an existing task or strategy (for now, remove and re-add, or switch strategy).
 - Clinic-wide admin screen (the switch-rule settings and clinician list are edited in Supabase).
 - Automatic deletion of inactive profiles after 12 months (the Privacy Policy promises this; for now it's done by hand).
 - Reminders in the web version (they need the App Store / Google Play app).

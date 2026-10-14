@@ -53,6 +53,7 @@ export const PRIVACY: LegalDoc = {
         [
           'We only collect what Stepwise needs to work.',
           'Only the people on your team can see your information: you, the support people you invite, and your Understanding ET therapist.',
+          'Your feelings and notes are private unless you choose to share them.',
           'Your information is stored securely by our database provider, Supabase, on servers in ' + DATA_LOCATION + '.',
           'We never sell your information, show you adverts, or use tracking tools.',
           'You can download your information, or delete it, at any time in Settings.',
@@ -99,7 +100,8 @@ export const PRIVACY: LegalDoc = {
       heading: 'Who can see it',
       body: [
         [
-          'Your team: everyone on a profile\'s team can see its tasks, check-ins, feelings and notes, and the names of the other team members.',
+          'Your team: everyone on a profile\'s team can see its tasks and check-ins, the notes they share, and the names of the other team members.',
+          'Your private log: feelings and notes are private by default. Only you can see them unless you choose to share them, one at a time or by changing the setting in Settings.',
           'Understanding ET staff, only when needed to support you or to fix a problem.',
           'Our service providers, who store and process information only on our instructions: Supabase (database and sign-in; data stored in ' +
             DATA_LOCATION +
@@ -210,7 +212,7 @@ export const TERMS: LegalDoc = {
       body: [
         [
           'The person a profile is for chooses who is on their team and can remove a support person at any time.',
-          'Everything logged on a profile can be seen by everyone on its team.',
+          'Tasks and check-ins on a profile can be seen by everyone on its team. The person the profile is for decides which of their feelings and notes to share.',
           'If you are a support person, you must keep what you see private and only use it to support the person.',
           'Only the therapist can switch or extend a strategy. Anyone on the team can add tasks.',
         ],

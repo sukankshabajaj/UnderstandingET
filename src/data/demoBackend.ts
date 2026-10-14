@@ -7,7 +7,7 @@ import type { Feel, Feeling, Helped, Member, NewPerson, Note, Reminder, Role, Sn
 import { todayISO } from '../logic/dates';
 import { POLICY_VERSION } from '../legal';
 
-const KEY = 'stepwise-demo-v2'; // v2: reminders are exact times
+const KEY = 'stepwise-demo-v3'; // v3: private notes, task icons
 
 export type DemoRole = keyof typeof DEMO_USERS;
 
@@ -59,9 +59,11 @@ export class DemoBackend implements Backend {
     return m;
   }
 
-  private note(db: DemoDB, personId: string, text: string, kind: Note['kind'] = 'system', feeling: Feeling | null = null) {
+  private note(db: DemoDB, personId: string, text: string, kind: Note['kind'] = 'system', feeling: Feeling | null = null, isPrivate = false) {
     const me = this.me(db, personId);
-    db.notes.unshift({ id: demoId('n'), person_id: personId, author_id: me.user_id, author_name: me.display_name, author_role: me.role, text, feeling, kind, created_at: new Date().toISOString() });
+    // Like the database: only the person the profile is for can keep entries private.
+    const priv = isPrivate && me.role === 'self';
+    db.notes.unshift({ id: demoId('n'), person_id: personId, author_id: me.user_id, author_name: me.display_name, author_role: me.role, text, feeling, kind, private: priv, created_at: new Date().toISOString() });
   }
 
   private strategy(db: DemoDB, id: string) {
@@ -203,7 +205,7 @@ export class DemoBackend implements Backend {
       tasks: db.tasks.filter((t) => t.person_id === personId && t.active),
       strategies: db.strategies.filter((s) => s.person_id === personId),
       logs: db.logs.filter((l) => l.person_id === personId),
-      notes: db.notes.filter((n) => n.person_id === personId).sort((a, b) => b.created_at.localeCompare(a.created_at)),
+      notes: db.notes.filter((n) => n.person_id === personId && (!n.private || n.author_id === db.userId)).sort((a, b) => b.created_at.localeCompare(a.created_at)),
       flags: db.flags.filter((f) => db.strategies.some((s) => s.id === f.strategy_id && s.person_id === personId) && !f.resolved_at),
       settings: db.settings,
     });
@@ -231,6 +233,18 @@ export class DemoBackend implements Backend {
     db.tasks.push({ id: taskId, person_id: personId, title: input.title.trim(), area: input.area, icon: input.icon, active: true, created_at: new Date().toISOString() });
     db.strategies.push({ id: demoId('s'), task_id: taskId, person_id: personId, ...input.strategy, name: input.strategy.name.trim(), trial_length_days: db.settings.trial_days, started_on: todayISO(), ended_on: null, end_reason: null, replaced_strategy_id: null });
     this.note(db, personId, `Added "${input.title.trim()}" with strategy "${input.strategy.name.trim()}".`);
+    await this.write(db);
+  }
+
+  async editTask(taskId: string, input: NewTaskInput) {
+    const db = await this.mustDb();
+    const t = db.tasks.find((x) => x.id === taskId);
+    if (!t) throw new Error('Task not found');
+    if (this.me(db, t.person_id).role === 'support') throw new Error('Only the person or their therapist can edit a task');
+    Object.assign(t, { title: input.title.trim(), area: input.area, icon: input.icon });
+    const s = db.strategies.find((x) => x.task_id === taskId && !x.ended_on);
+    if (s) Object.assign(s, { ...input.strategy, name: input.strategy.name.trim() });
+    this.note(db, t.person_id, `Edited "${input.title.trim()}".`);
     await this.write(db);
   }
 
@@ -287,15 +301,24 @@ export class DemoBackend implements Backend {
     await this.write(db);
   }
 
-  async logFeeling(personId: string, feeling: Feeling, note: string) {
+  async logFeeling(personId: string, feeling: Feeling, note: string, isPrivate: boolean) {
     const db = await this.mustDb();
-    this.note(db, personId, note.trim() || `Feeling ${feeling.toLowerCase()}.`, 'note', feeling);
+    this.note(db, personId, note.trim() || `Feeling ${feeling.toLowerCase()}.`, 'note', feeling, isPrivate);
     await this.write(db);
   }
 
-  async addNote(personId: string, text: string) {
+  async addNote(personId: string, text: string, isPrivate: boolean) {
     const db = await this.mustDb();
-    this.note(db, personId, text.trim(), 'note');
+    this.note(db, personId, text.trim(), 'note', null, isPrivate);
+    await this.write(db);
+  }
+
+  async setNotePrivate(noteId: string, isPrivate: boolean) {
+    const db = await this.mustDb();
+    const n = db.notes.find((x) => x.id === noteId);
+    if (!n || n.author_id !== db.userId) throw new Error('You can only change your own entries');
+    if (isPrivate && this.me(db, n.person_id).role !== 'self') throw new Error('Only the profile owner can keep entries private');
+    n.private = isPrivate;
     await this.write(db);
   }
 

@@ -4,7 +4,8 @@ import { Pressable, View } from 'react-native';
 import { useApp, useSnap } from '../state/app';
 import { AGE_BANDS, AREAS, FEELING, HELP_LABEL } from '../constants';
 import { colors, deep, mid, tint, HELP } from '../theme';
-import { BackLink, Btn, Card, Col, Icon, IconBtn, Input, Row, T } from '../ui/kit';
+import { BackLink, Btn, Card, Col, Emoji, Icon, IconBtn, Input, Row, ShareChoice, T, TaskIcon } from '../ui/kit';
+import { TaskManageButtons } from './Person';
 import { relativeDay, shortDate } from '../logic/dates';
 import { activeTasks, openFlag, pct, strategyStats, todayPlan, verdict, STATUS_HUE, type StrategyStats } from '../logic/stats';
 import type { Member, Snapshot, Strategy } from '../types';
@@ -91,7 +92,7 @@ export function Overview() {
             </T>
             {feelToday.map((n) => (
               <Row key={n.id} gap={5} style={{ paddingVertical: 4, paddingHorizontal: 9, borderRadius: 8, backgroundColor: tint(FEELING[n.feeling!].h) }}>
-                <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: mid(FEELING[n.feeling!].h) }} />
+                <Emoji size={15}>{FEELING[n.feeling!].emoji}</Emoji>
                 <T bold size={13}>
                   {n.feeling}
                 </T>
@@ -121,19 +122,20 @@ export function Overview() {
       <Col gap={8}>
         <Row justify="space-between">
           <T bold size={17}>
-            Strategies
+            Tasks and strategies
           </T>
           <Btn label="+ Add task" size="sm" onPress={() => app.openSheet({ kind: 'add' })} />
         </Row>
         {rows.map(({ task, strategy, st }) => (
           <Pressable key={strategy.id} accessibilityRole="button" onPress={() => app.go('strategy', { strategyId: strategy.id })} style={{ gap: 10, borderWidth: 1, borderColor: colors.border, backgroundColor: '#fff', borderRadius: 18, padding: 14 }}>
-            <Row justify="space-between" align="flex-start" gap={8}>
+            <Row justify="space-between" align="flex-start" gap={10}>
+              <TaskIcon icon={task.icon} area={task.area} size={40} />
               <Col gap={2} style={{ flex: 1 }}>
                 <T bold size={16}>
-                  {strategy.name}
+                  {task.title}
                 </T>
                 <T size={13} color={colors.muted}>
-                  {task.title} · {AREAS[task.area].name}
+                  {strategy.name}
                 </T>
               </Col>
               <StatusChip st={st} />
@@ -181,13 +183,18 @@ export function StrategyDetail() {
   return (
     <Col gap={18}>
       <BackLink label="Overview" onPress={app.back} />
-      <Col gap={6}>
-        <T size={13} color={colors.muted}>
-          {task.title} · {AREAS[task.area].name}
-        </T>
-        <T heading size={26} lh={1.15}>
-          {strategy.name}
-        </T>
+      <Col gap={8}>
+        <Row gap={12}>
+          <TaskIcon icon={task.icon} area={task.area} size={48} />
+          <Col gap={2} style={{ flex: 1 }}>
+            <T heading size={26} lh={1.15}>
+              {task.title}
+            </T>
+            <T size={16} color={colors.muted}>
+              Strategy: {strategy.name}
+            </T>
+          </Col>
+        </Row>
         <Row gap={8} style={{ flexWrap: 'wrap' }}>
           <StatusChip st={st} size={13} />
           <T size={13} color={colors.muted}>
@@ -305,6 +312,7 @@ export function StrategyDetail() {
           onPress={() => app.actions.setFlag(strategy.id, !flag, flag ? undefined : 'Your therapist will see this')}
         />
       ) : null}
+      <TaskManageButtons taskId={task.id} after={() => app.reset('overview')} />
     </Col>
   );
 }
@@ -312,41 +320,51 @@ export function StrategyDetail() {
 export function Notes() {
   const app = useSnap();
   const { snap, today } = app;
+  const isSelf = snap.me.role === 'self';
   const [text, setText] = useState('');
+  const [shared, setShared] = useState(snap.person.share_by_default);
   const others = snap.members.filter((m) => m.user_id !== snap.me.user_id).map((m) => m.display_name);
-  const sub = others.length ? `Shared with ${others.length === 1 ? others[0] : `${others.slice(0, -1).join(', ')} and ${others[others.length - 1]}`}` : 'Only you can see these until you invite your team.';
+  const names = others.length === 1 ? others[0] : `${others.slice(0, -1).join(', ')} and ${others[others.length - 1]}`;
+  const sub = isSelf
+    ? others.length
+      ? `Your feelings and notes are private unless you choose to share them with ${names}.`
+      : 'Your feelings and notes are private. Only you can see them.'
+    : `Notes shared on ${snap.person.first_name}'s team. ${snap.person.first_name} chooses which feelings and notes to share.`;
   const post = async () => {
     if (!text.trim()) return;
-    if (await app.actions.addNote(text)) setText('');
+    if (await app.actions.addNote(text, isSelf && !shared)) setText('');
   };
   return (
     <Col gap={14}>
       <T heading size={28} style={{ paddingTop: 8 }}>
-        Notes
+        {isSelf ? 'Notes and feelings' : 'Notes'}
       </T>
-      <T size={14} color={colors.muted}>
+      <T size={14} color={colors.muted} lh={1.45}>
         {sub}
       </T>
-      <Btn label="Log a feeling" variant="secondary" size="md" onPress={() => app.openSheet({ kind: 'feeling', feeling: null })} />
+      <Btn label="😊 Log a feeling" variant="secondary" size="md" onPress={() => app.openSheet({ kind: 'feeling', feeling: null })} />
       <Row gap={8} align="stretch">
-        <Input value={text} onChangeText={setText} placeholder="Add a note…" style={{ flex: 1, fontSize: 15 }} onSubmitEditing={post} returnKeyType="send" />
+        <Input value={text} onChangeText={setText} placeholder="Type, or tap 🎤 to speak" style={{ flex: 1, fontSize: 15 }} onSubmitEditing={post} returnKeyType="send" />
         <Btn label="Post" size="md" disabled={!text.trim()} onPress={post} />
       </Row>
+      {isSelf && others.length ? <ShareChoice shared={shared} onChange={setShared} /> : null}
       {snap.notes.map((n) => {
         const color = n.author_role === 'therapist' ? deep(255) : deep(175);
+        const mine = n.author_id === snap.me.user_id && n.kind === 'note';
         return (
-          <Card key={n.id} pad={14} gap={6} radius={18} style={n.kind === 'system' ? { backgroundColor: colors.bg } : undefined}>
+          <Card key={n.id} pad={14} gap={6} radius={18} style={n.kind === 'system' ? { backgroundColor: colors.bg } : n.private ? { backgroundColor: colors.infoBox, borderStyle: 'dashed' } : undefined}>
             <Row justify="space-between">
               <T bold size={13} color={color}>
                 {n.author_name || 'Team member'}
               </T>
               <T size={13} color={colors.muted}>
+                {n.private ? '🔒 Only you · ' : ''}
                 {relativeDay(n.created_at, today)}
               </T>
             </Row>
             {n.feeling ? (
               <Row gap={6} style={{ alignSelf: 'flex-start', paddingVertical: 4, paddingHorizontal: 10, borderRadius: 8, backgroundColor: tint(FEELING[n.feeling].h) }}>
-                <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: mid(FEELING[n.feeling].h) }} />
+                <Emoji size={16}>{FEELING[n.feeling].emoji}</Emoji>
                 <T bold size={13}>
                   Feeling {n.feeling.toLowerCase()}
                 </T>
@@ -355,6 +373,13 @@ export function Notes() {
             <T size={15} lh={1.45} color={n.kind === 'system' ? colors.secondary : colors.text}>
               {n.text}
             </T>
+            {isSelf && mine && others.length ? (
+              <Pressable accessibilityRole="button" hitSlop={6} onPress={() => app.actions.setNotePrivate(n.id, !n.private)} style={{ alignSelf: 'flex-start', minHeight: 36, justifyContent: 'center' }}>
+                <T bold size={13} color={colors.primary}>
+                  {n.private ? '👥 Share with my team' : '🔒 Make private'}
+                </T>
+              </Pressable>
+            ) : null}
           </Card>
         );
       })}

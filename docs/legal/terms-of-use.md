@@ -28,7 +28,7 @@ If you are in crisis or might harm yourself, contact emergency services or a hel
 ## Your team
 
 - The person a profile is for chooses who is on their team and can remove a support person at any time.
-- Everything logged on a profile can be seen by everyone on its team.
+- Tasks and check-ins on a profile can be seen by everyone on its team. The person the profile is for decides which of their feelings and notes to share.
 - If you are a support person, you must keep what you see private and only use it to support the person.
 - Only the therapist can switch or extend a strategy. Anyone on the team can add tasks.
 

@@ -465,7 +465,7 @@ export function ObTeam() {
       <Field label="Support person's email (optional)">
         <Input value={d.email2} onChangeText={(t) => set({ email2: t })} placeholder="name@email.com" autoCapitalize="none" keyboardType="email-address" />
       </Field>
-      <InfoBox icon="visibility">Everyone on the team can see tasks, check-ins, feelings and notes, and can add tasks.</InfoBox>
+      <InfoBox icon="visibility">Everyone on the team can see tasks and check-ins, and can add tasks. Feelings and notes stay private unless they are shared.</InfoBox>
     </StepFrame>
   );
 }

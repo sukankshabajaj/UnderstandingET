@@ -2,9 +2,9 @@
 import React, { useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { useSnap } from '../state/app';
-import { AREAS, AREA_KEYS, DAY_LETTER, DONE_TITLES, FEELING, FEELINGS, FREQS, STRATEGY_LIBRARY, formatTime, iconForTask } from '../constants';
+import { AREAS, AREA_KEYS, DAY_LETTER, DONE_TITLES, FEELING, FEELINGS, FREQS, STRATEGY_LIBRARY, TASK_ICONS, formatTime, iconForTask } from '../constants';
 import { colors, deep, mid, tint } from '../theme';
-import { Btn, Choice, Col, Field, Grid, Icon, Input, Row, Sheet, T, TimePicker } from '../ui/kit';
+import { Btn, Choice, Col, Emoji, Field, Grid, Icon, Input, Row, ShareChoice, Sheet, T, TimePicker } from '../ui/kit';
 import { freqText, todayPlan } from '../logic/stats';
 import type { Area, Feeling, Reminder } from '../types';
 
@@ -15,7 +15,10 @@ export function Sheets() {
   return (
     <>
       <Sheet visible={s?.kind === 'add'} onClose={app.closeSheet} reduceMotion={rm} scroll>
-        {s?.kind === 'add' ? <AddTask /> : null}
+        {s?.kind === 'add' ? <TaskForm /> : null}
+      </Sheet>
+      <Sheet visible={s?.kind === 'edit'} onClose={app.closeSheet} reduceMotion={rm} scroll>
+        {s?.kind === 'edit' ? <TaskForm taskId={s.taskId} /> : null}
       </Sheet>
       <Sheet visible={s?.kind === 'feeling'} onClose={app.closeSheet} reduceMotion={rm}>
         {s?.kind === 'feeling' ? <FeelingSheet initial={s.feeling} /> : null}
@@ -30,27 +33,43 @@ export function Sheets() {
   );
 }
 
-function AddTask() {
+/** Add a new task, or edit an existing one (and its current strategy) when taskId is given. */
+function TaskForm({ taskId }: { taskId?: string }) {
   const app = useSnap();
-  const [title, setTitle] = useState('');
-  const [area, setArea] = useState<Area>((app.snap.person.tracked_areas[0] as Area) ?? 'daily');
-  const [strat, setStrat] = useState('');
-  const [steps, setSteps] = useState<string[]>(['']);
-  const [freq, setFreq] = useState(7);
-  const [days, setDays] = useState<number[]>([]);
-  const [rem, setRem] = useState<Reminder | null>(null);
+  const task = taskId ? app.snap.tasks.find((t) => t.id === taskId) : undefined;
+  const cur = task ? app.snap.strategies.find((s) => s.task_id === task.id && !s.ended_on) : undefined;
+  const editing = !!task && !!cur;
+  const [title, setTitle] = useState(task?.title ?? '');
+  const [area, setArea] = useState<Area>(task?.area ?? (app.snap.person.tracked_areas[0] as Area) ?? 'daily');
+  const [icon, setIcon] = useState<string | null>(task?.icon ?? null); // null = pick automatically from the title
+  const [strat, setStrat] = useState(cur?.name ?? '');
+  const [desc, setDesc] = useState(cur?.description ?? '');
+  const [steps, setSteps] = useState<string[]>(cur?.steps.length ? cur.steps : ['']);
+  const [freq, setFreq] = useState(cur && !cur.freq_days.length ? cur.freq_per_week : 7);
+  const [days, setDays] = useState<number[]>(cur?.freq_days ?? []);
+  const [rem, setRem] = useState<Reminder | null>(cur?.reminder ?? null);
   const [busy, setBusy] = useState(false);
   const ok = !!title.trim() && !!strat.trim();
   const name = app.snap.person.first_name;
+  const shownIcon = icon ?? iconForTask(title, area);
   const save = async () => {
     if (!ok || busy) return;
     setBusy(true);
-    const done = await app.actions.addTask({
+    const input = {
       title: title.trim(),
       area,
-      icon: iconForTask(title, area),
-      strategy: { name: strat.trim(), description: '', steps: steps.map((x) => x.trim()).filter(Boolean), timer_minutes: 0, freq_per_week: days.length || freq, freq_days: [...days].sort(), reminder: rem },
-    });
+      icon: shownIcon,
+      strategy: {
+        name: strat.trim(),
+        description: desc.trim(),
+        steps: steps.map((x) => x.trim()).filter(Boolean),
+        timer_minutes: cur?.timer_minutes ?? 0,
+        freq_per_week: days.length || freq,
+        freq_days: [...days].sort((a, b) => a - b),
+        reminder: rem,
+      },
+    };
+    const done = editing ? await app.actions.editTask(task!.id, input) : await app.actions.addTask(input);
     setBusy(false);
     if (done) app.closeSheet();
   };
@@ -58,14 +77,35 @@ function AddTask() {
     <Col gap={16}>
       <Col gap={4}>
         <T heading size={20}>
-          New task
+          {editing ? 'Edit task' : 'New task'}
         </T>
         <T size={14} color={colors.muted} lh={1.4}>
-          Everyone on {name}'s team can add tasks. It shows up for {name} and the whole team.
+          {editing
+            ? 'Fix or update the details. The trial and its results are kept. To try a different strategy, use "Switch strategy".'
+            : `Everyone on ${name}'s team can add tasks. It shows up for ${name} and the whole team.`}
         </T>
       </Col>
       <Field label="Task">
-        <Input value={title} onChangeText={setTitle} placeholder="e.g. Clothes ready before sleep" />
+        <Input value={title} onChangeText={setTitle} placeholder="e.g. Medicines morning" />
+      </Field>
+      <Field label="Icon">
+        <Grid cols={6} gap={6}>
+          {TASK_ICONS.map((ic) => {
+            const on = ic === shownIcon;
+            return (
+              <Pressable
+                key={ic}
+                accessibilityRole="radio"
+                accessibilityState={{ selected: on }}
+                accessibilityLabel={ic.replace(/_/g, ' ')}
+                onPress={() => setIcon(ic)}
+                style={{ height: 48, borderRadius: 12, borderWidth: 2, borderColor: on ? deep(AREAS[area].h) : colors.border, backgroundColor: on ? tint(AREAS[area].h) : '#fff', alignItems: 'center', justifyContent: 'center' }}
+              >
+                <Icon name={ic} size={24} color={on ? deep(AREAS[area].h) : colors.secondary} />
+              </Pressable>
+            );
+          })}
+        </Grid>
       </Field>
       <Field label="Area">
         <Grid cols={2}>
@@ -79,8 +119,13 @@ function AddTask() {
         </Grid>
       </Field>
       <Field label="Strategy to try">
-        <Input value={strat} onChangeText={setStrat} placeholder="e.g. Lay clothes on the chair" />
+        <Input value={strat} onChangeText={setStrat} placeholder="e.g. Pill box by the kettle" />
       </Field>
+      {editing ? (
+        <Field label="How the strategy works" optional>
+          <Input value={desc} onChangeText={setDesc} placeholder="A short description" multiline style={{ minHeight: 64, textAlignVertical: 'top' }} />
+        </Field>
+      ) : null}
       <Field label="Steps to follow" optional>
         {steps.map((v, i) => (
           <Row key={i} gap={6}>
@@ -147,7 +192,7 @@ function AddTask() {
           {app.reminders.webNote ? <ReminderWebNote /> : null}
         </Field>
       ) : null}
-      <Btn label={busy ? 'Adding…' : 'Add task'} size="md" disabled={!ok || busy} onPress={save} />
+      <Btn label={busy ? 'Saving…' : editing ? 'Save changes' : 'Add task'} size="md" disabled={!ok || busy} onPress={save} />
     </Col>
   );
 }
@@ -158,12 +203,14 @@ function FeelingSheet({ initial }: { initial: Feeling | null }) {
   const [note, setNote] = useState('');
   const [saved, setSaved] = useState(false);
   const [busy, setBusy] = useState(false);
+  const isSelf = app.snap.me.role === 'self';
+  const [shared, setShared] = useState(app.snap.person.share_by_default);
   if (saved && feel) {
     const f = FEELING[feel];
     return (
       <Col gap={16} style={{ alignItems: 'center', paddingTop: 8, paddingHorizontal: 4 }}>
         <View style={{ width: 72, height: 72, borderRadius: 36, backgroundColor: tint(f.h), alignItems: 'center', justifyContent: 'center' }}>
-          <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: mid(f.h) }} />
+          <Emoji size={40}>{f.emoji}</Emoji>
         </View>
         <T heading size={22}>
           {f.title}
@@ -180,7 +227,7 @@ function FeelingSheet({ initial }: { initial: Feeling | null }) {
           </T>
         </View>
         <T size={13} color={colors.muted}>
-          {app.snap.me.role === 'self' ? 'Saved to Notes. Your team can see it.' : 'Saved to Notes.'}
+          {!isSelf ? 'Saved to Notes.' : shared ? 'Saved to Notes. Your team can see it.' : '🔒 Saved to your private log. Only you can see it.'}
         </T>
         <Btn label="Done" size="md" style={{ alignSelf: 'stretch' }} onPress={app.closeSheet} />
       </Col>
@@ -196,7 +243,7 @@ function FeelingSheet({ initial }: { initial: Feeling | null }) {
           const on = feel === f.label;
           return (
             <Pressable key={f.label} accessibilityRole="radio" accessibilityState={{ selected: on }} onPress={() => setFeel(f.label)} style={{ alignItems: 'center', gap: 8, borderWidth: 2, borderColor: on ? deep(f.h) : colors.border, backgroundColor: on ? tint(f.h) : '#fff', borderRadius: 16, paddingVertical: 14, paddingHorizontal: 4 }}>
-              <Icon name={f.icon} size={32} color={deep(f.h)} />
+              <Emoji size={32}>{f.emoji}</Emoji>
               <T bold size={14}>
                 {f.label}
               </T>
@@ -205,6 +252,7 @@ function FeelingSheet({ initial }: { initial: Feeling | null }) {
         })}
       </Grid>
       <Input value={note} onChangeText={setNote} placeholder="Want to add a note? (optional)" />
+      {isSelf ? <ShareChoice shared={shared} onChange={setShared} /> : null}
       <Btn
         label={busy ? 'Saving…' : 'Save'}
         size="md"
@@ -212,7 +260,7 @@ function FeelingSheet({ initial }: { initial: Feeling | null }) {
         onPress={async () => {
           if (!feel) return;
           setBusy(true);
-          if (await app.actions.logFeeling(feel, note)) setSaved(true);
+          if (await app.actions.logFeeling(feel, note, isSelf && !shared)) setSaved(true);
           setBusy(false);
         }}
       />

@@ -10,6 +10,7 @@ export const AREA_KEYS = Object.keys(AREAS) as Area[];
 
 export interface FeelingInfo {
   label: Feeling;
+  emoji: string;
   icon: string;
   h: number;
   title: string;
@@ -18,19 +19,29 @@ export interface FeelingInfo {
 }
 
 export const FEELINGS: FeelingInfo[] = [
-  { label: 'Calm', icon: 'self_improvement', h: 150, title: 'Good to hear', text: 'Feeling calm is a good time to start something tricky.', tip: 'Pick the next task while you feel steady.' },
-  { label: 'Happy', icon: 'sentiment_very_satisfied', h: 95, title: 'That is great', text: 'Something is going well today.', tip: 'Add a note about what made it good, so you can do it again.' },
-  { label: 'Tired', icon: 'battery_2_bar', h: 255, title: 'Thanks for noticing', text: 'Being tired makes everything harder. That is normal.', tip: 'Drink some water or take a 5 minute rest before the next task.' },
-  { label: 'Worried', icon: 'sentiment_worried', h: 300, title: 'Thanks for telling us', text: 'Worries feel big. Naming them is a good first step.', tip: 'Name one thing you can control right now.' },
-  { label: 'Frustrated', icon: 'sentiment_frustrated', h: 40, title: 'That is okay', text: 'Frustration means something is hard. It does not mean you are failing.', tip: 'Take a 3 minute movement break, then try one small step.' },
-  { label: 'Overwhelmed', icon: 'sentiment_stressed', h: 25, title: 'Thanks for telling us', text: 'When it is too much, make the next step tiny.', tip: 'Do just one small step, or ask someone for help.' },
+  { label: 'Calm', emoji: '😌', icon: 'self_improvement', h: 150, title: 'Good to hear', text: 'Feeling calm is a good time to start something tricky.', tip: 'Pick the next task while you feel steady.' },
+  { label: 'Happy', emoji: '😊', icon: 'sentiment_very_satisfied', h: 95, title: 'That is great', text: 'Something is going well today.', tip: 'Add a note about what made it good, so you can do it again.' },
+  { label: 'Tired', emoji: '😴', icon: 'battery_2_bar', h: 255, title: 'Thanks for noticing', text: 'Being tired makes everything harder. That is normal.', tip: 'Drink some water or take a 5 minute rest before the next task.' },
+  { label: 'Worried', emoji: '😟', icon: 'sentiment_worried', h: 300, title: 'Thanks for telling us', text: 'Worries feel big. Naming them is a good first step.', tip: 'Name one thing you can control right now.' },
+  { label: 'Frustrated', emoji: '😤', icon: 'sentiment_frustrated', h: 40, title: 'That is okay', text: 'Frustration means something is hard. It does not mean you are failing.', tip: 'Take a 3 minute movement break, then try one small step.' },
+  { label: 'Overwhelmed', emoji: '😫', icon: 'sentiment_stressed', h: 25, title: 'Thanks for telling us', text: 'When it is too much, make the next step tiny.', tip: 'Do just one small step, or ask someone for help.' },
 ];
 export const FEELING: Record<Feeling, FeelingInfo> = Object.fromEntries(FEELINGS.map((f) => [f.label, f])) as Record<Feeling, FeelingInfo>;
 
-export const FEEL_OPTS: { label: Feel; h: number; icon: string }[] = [
-  { label: 'Easy', h: 150, icon: 'sentiment_satisfied' },
-  { label: 'Okay', h: 75, icon: 'sentiment_neutral' },
-  { label: 'Hard', h: 25, icon: 'sentiment_dissatisfied' },
+export const FEEL_OPTS: { label: Feel; h: number; icon: string; emoji: string }[] = [
+  { label: 'Easy', h: 150, icon: 'sentiment_satisfied', emoji: '🙂' },
+  { label: 'Okay', h: 75, icon: 'sentiment_neutral', emoji: '😐' },
+  { label: 'Hard', h: 25, icon: 'sentiment_dissatisfied', emoji: '😣' },
+];
+export const FEEL_EMOJI: Record<Feel, string> = { Easy: '🙂', Okay: '😐', Hard: '😣' };
+
+/** Icons people can choose for a task (Material Symbols names). */
+export const TASK_ICONS = [
+  'medication', 'light_mode', 'bedtime', 'restaurant', 'water_drop', 'local_cafe',
+  'directions_walk', 'fitness_center', 'self_improvement', 'shower', 'checkroom', 'cleaning_services',
+  'local_laundry_service', 'shopping_cart', 'pets', 'menu_book', 'school', 'calculate',
+  'work', 'campaign', 'groups', 'mail', 'call', 'payments',
+  'event', 'music_note', 'brush', 'sports_esports', 'pill', 'home',
 ];
 
 export const HELP_OPTS: { label: string; value: 0 | 1 | 2; icon: string }[] = [

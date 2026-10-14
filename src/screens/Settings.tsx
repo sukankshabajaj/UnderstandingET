@@ -85,6 +85,15 @@ export function Settings() {
         {ACCESS_OPTS.map((o) => (
           <AccessRow key={o.k} icon={o.icon} label={o.label} sub={o.sub} on={snap.person[o.field]} onPress={() => (canEdit ? app.actions.updatePerson({ [o.field]: !snap.person[o.field] }) : app.toast(`Only ${snap.person.first_name} or their therapist can change this`))} />
         ))}
+        {me.role === 'self' ? (
+          <AccessRow
+            icon="lock"
+            label="Share new feelings and notes"
+            sub={snap.person.share_by_default ? 'On: your team sees new entries. You can still keep any entry private.' : 'Off: new entries are your private log. You can share any entry later.'}
+            on={snap.person.share_by_default}
+            onPress={() => app.actions.updatePerson({ share_by_default: !snap.person.share_by_default })}
+          />
+        ) : null}
         {app.reminders.shown ? (
         <AccessRow
           icon="lock"

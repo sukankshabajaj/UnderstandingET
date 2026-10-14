@@ -16,7 +16,9 @@ import {
   type ViewStyle,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, fonts } from '../theme';
+import { colors, deep, fonts, tint } from '../theme';
+import { AREAS } from '../constants';
+import type { Area } from '../types';
 import { GLYPHS } from './glyphs';
 
 // --- Text ---------------------------------------------------------------------
@@ -421,6 +423,44 @@ export function TimePicker({ value, onChange }: { value: string; onChange: (v: s
           if (k === 'am' && pm) set(h - 12, m);
         }}
       />
+    </View>
+  );
+}
+
+/** An emoji, drawn with the phone's own emoji font. */
+export function Emoji({ children, size = 24, label }: { children: string; size?: number; label?: string }) {
+  return (
+    <Text accessibilityLabel={label} accessible={!!label} style={{ fontSize: size, lineHeight: Math.round(size * 1.2), textAlign: 'center' }}>
+      {children}
+    </Text>
+  );
+}
+
+/** "Who can see this?" choice for the person's own feelings and notes. */
+export function ShareChoice({ shared, onChange }: { shared: boolean; onChange: (shared: boolean) => void }) {
+  return (
+    <Col gap={6}>
+      <T bold size={14}>
+        Who can see this?
+      </T>
+      <Segmented<'me' | 'team'>
+        options={[
+          ['me', '🔒 Only me'],
+          ['team', '👥 My team'],
+        ]}
+        value={shared ? 'team' : 'me'}
+        onChange={(k) => onChange(k === 'team')}
+      />
+    </Col>
+  );
+}
+
+/** A task's icon on a soft tile in its area colour. */
+export function TaskIcon({ icon, area, size = 44 }: { icon: string | null; area: Area; size?: number }) {
+  const a = AREAS[area];
+  return (
+    <View style={{ width: size, height: size, borderRadius: Math.round(size * 0.32), backgroundColor: tint(a.h), alignItems: 'center', justifyContent: 'center' }}>
+      <Icon name={icon ?? a.icon} size={Math.round(size * 0.58)} color={deep(a.h)} />
     </View>
   );
 }

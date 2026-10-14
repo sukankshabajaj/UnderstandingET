@@ -4,7 +4,7 @@ import { Pressable, View } from 'react-native';
 import { useSnap } from '../state/app';
 import { AREAS, DAY_LETTER, HELP_LABEL, MONTHS, MONTHS_LONG, WEEKDAYS_LONG } from '../constants';
 import { colors, deep, mid, HELP } from '../theme';
-import { Btn, Card, Col, Row, Segmented, T } from '../ui/kit';
+import { Btn, Card, Col, Row, Segmented, T, TaskIcon } from '../ui/kit';
 import { addDays, fromISO, mondayOf, shortDate, toISO, weekdayMon0 } from '../logic/dates';
 import { dayInfo, freqText, weekRows, weeklyTarget, type DayValue } from '../logic/stats';
 
@@ -111,7 +111,7 @@ export function Tracker() {
               <Card key={r.task.id} pad={14} gap={10} radius={18}>
                 <Row justify="space-between" align="flex-start" gap={8}>
                   <Row gap={10} align="flex-start" style={{ flex: 1 }}>
-                    <View style={{ width: 10, height: 10, borderRadius: 5, marginTop: 6, backgroundColor: mid(a.h) }} />
+                    <TaskIcon icon={r.task.icon} area={r.task.area} size={32} />
                     <Col gap={2} style={{ flex: 1 }}>
                       <T bold size={16}>
                         {r.task.title}

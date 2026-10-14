@@ -16,5 +16,5 @@ $RUN "$BIN/initdb" -D "$DIR/data" -U postgres --auth=trust >/dev/null
 $RUN "$BIN/pg_ctl" -D "$DIR/data" -o "-p $PORT -k $DIR -c listen_addresses=''" -l "$DIR/log" -w start >/dev/null
 PSQL=("$BIN/psql" -h "$DIR" -p "$PORT" -U postgres -d postgres -v ON_ERROR_STOP=1 -q)
 "${PSQL[@]}" -f supabase_stub.sql >/dev/null
-"${PSQL[@]}" -f ../migrations/20261005000000_init.sql >/dev/null
-"${PSQL[@]}" -tA -f rls_test.sql 2>&1 | sed "s/^psql:[^:]*:[0-9]*: NOTICE:  /  /" | grep -vE "^(00000000-.*)?$"
+for f in ../migrations/*.sql; do "${PSQL[@]}" -f "$f" >/dev/null; done
+for t in rls_test.sql update2_test.sql; do "${PSQL[@]}" -tA -f "$t" 2>&1 || exit 1; done | sed "s/^psql:[^:]*:[0-9]*: NOTICE:  /  /" | grep -vE "^(00000000-.*)?$"

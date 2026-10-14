@@ -4,7 +4,7 @@ import { Pressable, View } from 'react-native';
 import { useSnap } from '../state/app';
 import { AREAS, AREA_KEYS, FEELINGS, FEEL_OPTS, HELP_OPTS, DAY_LETTER, formatTime } from '../constants';
 import { colors, deep, mid, tint, HELP_HUE } from '../theme';
-import { BackLink, Btn, Card, Col, Grid, Icon, IconBtn, Row, T } from '../ui/kit';
+import { BackLink, Btn, Card, Col, Emoji, Grid, Icon, IconBtn, Row, T } from '../ui/kit';
 import { longDate, weekdayMon0 } from '../logic/dates';
 import { areaWeek, freqText, strategyStats, todayPlan, activeTasks, type TaskDay } from '../logic/stats';
 import { speak } from '../speech';
@@ -90,7 +90,7 @@ export function Today() {
         <Grid cols={3}>
           {FEELINGS.map((f) => (
             <Pressable key={f.label} accessibilityRole="button" accessibilityLabel={`Feeling ${f.label}`} onPress={() => app.openSheet({ kind: 'feeling', feeling: f.label })} style={{ alignItems: 'center', gap: 6, backgroundColor: tint(f.h), borderRadius: 12, paddingVertical: 10, paddingHorizontal: 4, minHeight: 56 }}>
-              <Icon name={f.icon} size={26} color={deep(f.h)} />
+              <Emoji size={26}>{f.emoji}</Emoji>
               <T bold size={13} align="center">
                 {f.label}
               </T>
@@ -256,16 +256,7 @@ export function TaskScreen() {
         </Col>
       ) : null}
       <Btn label="I'm done" onPress={() => app.go('checkin', { taskId: task.id })} />
-      <Btn
-        label="Remove this task"
-        variant="ghost"
-        size="md"
-        onPress={async () => {
-          if (await confirm('Remove this task?', 'It comes off the plan for everyone. Its history is kept.', 'Remove')) {
-            if (await app.actions.archiveTask(task.id)) app.reset('today');
-          }
-        }}
-      />
+      <TaskManageButtons taskId={task.id} after={() => app.reset('today')} />
     </Col>
   );
 }
@@ -292,7 +283,7 @@ export function CheckIn() {
           return (
             <Pressable key={o.label} accessibilityRole="radio" accessibilityState={{ selected: on }} onPress={() => setFeel(o.label)} style={{ flex: 1, alignItems: 'center', gap: 10, borderWidth: 2, borderColor: on ? deep(o.h) : colors.border, backgroundColor: on ? tint(o.h) : '#fff', borderRadius: 20, paddingVertical: 16, paddingHorizontal: 6 }}>
               <View style={{ width: 52, height: 52, borderRadius: 26, backgroundColor: tint(o.h), alignItems: 'center', justifyContent: 'center' }}>
-                <Icon name={o.icon} size={34} color={deep(o.h)} />
+                <Emoji size={34}>{o.emoji}</Emoji>
               </View>
               <T bold size={16}>
                 {o.label}
@@ -405,3 +396,27 @@ export function MyWeek() {
   );
 }
 
+
+/** "Edit task" and "Delete task" — for the person and their therapist (support people can flag instead). */
+export function TaskManageButtons({ taskId, after }: { taskId: string; after: () => void }) {
+  const app = useSnap();
+  if (app.snap.me.role === 'support') return null;
+  return (
+    <Row gap={10}>
+      <Btn label="Edit task" icon="edit" variant="secondary" size="md" style={{ flex: 1 }} onPress={() => app.openSheet({ kind: 'edit', taskId })} />
+      <Btn
+        label="Delete task"
+        icon="delete"
+        variant="ghost"
+        size="md"
+        color={colors.alertFg}
+        style={{ flex: 1 }}
+        onPress={async () => {
+          if (await confirm('Delete this task?', 'It comes off the plan for everyone on the team. Use this if it was added by mistake or is no longer needed.', 'Delete')) {
+            if (await app.actions.archiveTask(taskId)) after();
+          }
+        }}
+      />
+    </Row>
+  );
+}
