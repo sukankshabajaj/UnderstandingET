@@ -79,6 +79,9 @@ We use **Supabase** for this. It provides the database, logins and privacy rules
 
    Use the email you will sign up with in the app. Add any other Understanding ET therapists the same way.
 
+**Database updates:** after the first file, run every other file in `supabase/migrations/` the same way, **in date order**
+(the date is the start of the file name, e.g. `20261014000000_private_logs_and_editing.sql`). Each file is run **once**.
+
 ### 3. Check the login settings
 
 In **Authentication → Sign In / Providers → Email**:
